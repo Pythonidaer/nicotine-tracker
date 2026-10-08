@@ -30,6 +30,20 @@ Serve this folder with any static HTTP server. Service workers require HTTPS or 
 - [ ] Prepare privacy policy, support contact, App Store screenshots, description, and required privacy disclosures.
 - [ ] Submit for App Review and release after approval.
 
+### Mobile visual design and animation
+- [ ] Choose a consistent visual style, color palette, typography, and spacing system while preserving compact controls and minimal layouts.
+- [ ] Design and review one polished native screen before extending the design across the app.
+- [ ] Build reusable native components for navigation, buttons, selection states, progress indicators, and chart labels.
+- [ ] Improve chart readability and add satisfying, subtle pouch-logging feedback first.
+- [ ] Create original matching illustrations, optional pouch characters, and icons as SVG or transparent PNG assets.
+- [ ] Explore illustrated onboarding after the core tracking screens are polished; use competitor references for inspiration rather than copying assets.
+- [ ] Evaluate Lottie for illustrated character animations; prepare separate artwork layers and animation exports rather than assuming a static generated image is animation-ready.
+- [ ] Evaluate react-native-svg for circular indicators and data-driven bars; animate meaningful changes where helpful.
+- [ ] Evaluate Reanimated for screen transitions, selection changes, and simple floating, scaling, or fading effects.
+- [ ] Add motion after layouts and interactions work, support reduced motion, and ensure charts and states remain accessible without animation or color alone.
+- [ ] Use real data and transparent calculations for comparisons; show a community benchmark only when supported by an appropriate dataset.
+- [ ] Maintain a true one-time purchase for permanent access, with no subscription or expiring trial (price remains tentative).
+
 ### Feedback
 - [ ] Add an in-app feedback form with categories: issue, feature request, and other feedback.
 - [ ] Choose a submission destination and optional reply contact; obtain consent before attaching logs or diagnostics.
