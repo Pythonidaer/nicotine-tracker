@@ -58,3 +58,7 @@ Serve this folder with any static HTTP server. Service workers require HTTPS or 
 ### Broader nicotine tracking and optional sync
 - [ ] Support alternative forms of nicotine with product-appropriate units and measurements.
 - [ ] Evaluate optional Google login and cloud sync after the local-first trial.
+
+## Design instructions
+
+Read [AGENTS.md](AGENTS.md) and [DESIGN_GUIDANCE.md](DESIGN_GUIDANCE.md). This app applies the shared toolkit design reset with a sticky frosted header. Four bottom tabs remain an intentional app-specific exception to the toolkit dropdown default. Motion reveals and the roadmap are optional patterns and are not enabled here.
