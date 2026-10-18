@@ -62,3 +62,7 @@ Serve this folder with any static HTTP server. Service workers require HTTPS or 
 ## Design instructions
 
 Read [AGENTS.md](AGENTS.md) and [DESIGN_GUIDANCE.md](DESIGN_GUIDANCE.md). This app applies the shared toolkit design reset with a sticky frosted header. Four bottom tabs remain an intentional app-specific exception to the toolkit dropdown default. Motion reveals and the roadmap are optional patterns and are not enabled here.
+
+## Refresh the installed app
+
+Settings → Update app checks for a service-worker update, refreshes the current app files, and reloads. It requires an internet connection and does not clear localStorage, logs, settings, or backups. There is no need to delete or reinstall the PWA. Export a backup regularly. Older installed versions can receive this Settings action by closing and reopening the app while online.

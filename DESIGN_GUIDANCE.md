@@ -29,3 +29,9 @@ The toolkit is the shared source; this file records the app's decisions and exce
 ## Verification for this change
 
 JavaScript syntax and whitespace checks passed. A lightweight simulated-DOM smoke check exercised logging, undo, settings, reload persistence, purchases, trends, history, deletion, and navigation state/focus calls. These checks do not establish rendered geometry or browser focus behavior. Browser installation failed in this environment; mobile Safari appearance, safe areas, blur rendering, keyboard behavior, and offline reopening remain for device review. Backup schema and storage key were preserved; export/restore logic was not changed.
+
+## App refresh and skip link correction
+
+Settings includes Update app: check/install an available service worker, activate it through an explicit message, refresh the current HTML/script/stylesheet URLs, then reload. Failures show a retryable status; this action never clears localStorage or invokes backup restore. Explicit reload requests fail on network errors rather than silently accepting offline cached files. Asset URLs and the app-shell cache are versioned together to prevent the previous stylesheet being mixed with new markup.
+
+The skip link uses clipped offscreen styling and becomes visible only with keyboard focus-visible, preserving keyboard access without a touch-focused label. JavaScript syntax and existing tracking smoke checks pass. Native PWA update lifecycle and iPhone rendering remain for device review.

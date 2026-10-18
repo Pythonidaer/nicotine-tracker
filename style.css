@@ -94,7 +94,8 @@ body { margin: 0; background: var(--p-bg); color: var(--p-fg); }
 #pouch-preview .recent summary::-webkit-details-marker { display: none; }
 #pouch-preview .chevron { flex: none; }
 #pouch-preview .recent[open] .chevron { transform: rotate(180deg); }
-#pouch-preview .skip-link { position: fixed; left: 16px; top: 12px; transform: translateY(-200%); z-index: 3; padding: 8px 12px; background: var(--p-bg); color: var(--p-fg); }
-#pouch-preview .skip-link:focus { transform: none; }
+#pouch-preview .skip-link { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+#pouch-preview .skip-link:focus-visible { position: fixed; left: 16px; top: 12px; width: auto; height: auto; margin: 0; clip-path: none; z-index: 3; padding: 8px 12px; background: var(--p-bg); color: var(--p-fg); }
+#pouch-preview button:disabled { opacity: .65; cursor: wait; }
 @media (prefers-reduced-motion: no-preference) { #pouch-preview .chevron { transition: transform 150ms ease; } }
 @media (min-width: 640px) { #pouch-preview main { padding: 24px; } }
