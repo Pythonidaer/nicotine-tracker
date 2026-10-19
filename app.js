@@ -33,7 +33,7 @@ function pouchEntryMarkup(){
     <div class="pouch-product-fields"><div>${entryPicker('brand','Brand',['On!','Velo','Zyn'].map(value=>({value,label:value})),product.brand)}</div>
     <div>${entryPicker('mg','Nicotine per pouch',[3,6,9,11,12,15].map(mg=>({value:String(mg),label:`${mg} mg`})),product.mg)}</div></div>
     ${entryPicker('activity','What are you doing? (optional)',['',...activityOptions].map(value=>({value,label:value||'Not specified'})),'')}
-    <div class="pouch-form-actions"><button type="submit" class="primary">Add pouch</button><button type="button" data-action="cancel-pouch">Cancel</button></div>
+    <div class="form-actions"><button type="submit" class="primary">Add pouch</button><button type="button" data-action="cancel-pouch">Cancel</button></div>
   </form>`:'';
   return `<section class="pouch-entry" aria-labelledby="pouch-entry-title"><div class="row pouch-entry-heading"><h2 id="pouch-entry-title">Add pouch</h2>
     ${notice?`<div class="pouch-feedback" role="status" aria-live="polite">${notice}<button type="button" class="link" data-action="undo">Undo</button></div>`:`<button type="button" class="add-entry-icon" data-action="open-pouch" aria-label="${pouchFormOpen?'Close pouch entry':'Add pouch entry'}" aria-expanded="${pouchFormOpen}" aria-controls="pouch-entry-form">${pouchFormOpen?closeEntryIcon:addEntryIcon}</button>`}

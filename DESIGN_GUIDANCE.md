@@ -95,3 +95,7 @@ Opening Add pouch replaces the Today overview with the entry form, following the
 ## Full-width mobile pouch fields, 2026-10-19
 
 Below 640px, the dedicated Add pouch form stacks Brand and Nicotine per pouch at full width, matching its Activity field and the Log purchase inputs. Desktop keeps the existing two-column brand/strength layout. History editing layout remains unchanged.
+
+## Shared form action spacing, 2026-10-19
+
+Add pouch uses the same form-actions class as Log purchase and default product settings: 20px above the action row and 12px between buttons. Remove the separate pouch action spacing rule so these forms stay consistent.

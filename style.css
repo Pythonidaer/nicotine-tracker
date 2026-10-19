@@ -162,7 +162,6 @@ body { margin: 0; background: var(--p-bg); color: var(--p-fg); }
 #pouch-preview .pouch-entry-heading h2 { margin: 0; }
 #pouch-preview .add-entry-icon { width: 44px; height: 44px; padding: 10px; display: grid; place-items: center; border: 0; color: var(--p-accent); }
 #pouch-preview .pouch-product-fields { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 12px; }
-#pouch-preview .pouch-form-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 12px; }
 #pouch-preview .pouch-feedback { display: flex; align-items: center; gap: 8px; color: var(--p-accent); font-size: 12px; }
 @media (max-width: 340px) { #pouch-preview .pouch-product-fields { grid-template-columns: 1fr; gap: 0; } }
 
