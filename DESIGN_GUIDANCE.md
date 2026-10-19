@@ -31,3 +31,11 @@ Content owner: repository owner. Source map and maintenance triggers: [RESOURCE_
 Keep pouch-tracker-v1 localStorage and version 1 backups unchanged. Never clear stored logs during an interface refresh. Settings → Update app remains the supported installed-PWA refresh path. Asset query versions and service-worker caches advance together; app shell, resource copy, fonts and icons are cached locally. No new database, account, analytics, or cloud dependency.
 
 Keep the skip link available for keyboard focus, hidden during ordinary touch use. Screen changes move focus to main content and return to the top. Current destination is identified with aria-current and a visible selected state.
+
+## Verification, 2026-10-19
+
+- JavaScript syntax and git whitespace checks passed.
+- Simulated-DOM regression checks passed for existing version-1 data, menu dismissal/focus, all resource section anchors, settings, log/undo, purchases/totals, history, trends, reload persistence and the update action.
+- All service-worker asset paths resolve to files in the repository, including local fonts and resource copy.
+- Published GitHub Pages was checked in Chrome. Settings → Update app upgraded the previous app shell and preserved a saved test pouch; test data was then removed. Dropdown destinations and the resource guide rendered correctly. Computed heading/body families and non-sticky header position matched the intended design; no horizontal overflow at the inspected desktop width.
+- iPhone narrow-screen appearance, larger text, light/dark mode, and true offline reopening remain for device review. No claim of native Safari verification.
