@@ -3,7 +3,6 @@ window.pouchResources = `
 <article class="resource-page" aria-labelledby="resources-title">
   <h1 id="resources-title">Quitting nicotine</h1>
   <p>You have a record of your pouch use. Now you can use it to decide what to change. Start with one manageable step, plan for the moments that trip you up, and get help when you need it.</p>
-  <p class="resource-meta">Reviewed October 19, 2026</p>
   <nav class="resource-contents" aria-label="On this page">
     <a href="#notice-pattern">Notice the pattern</a>
     <a href="#make-change">Make one change</a>
