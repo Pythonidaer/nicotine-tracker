@@ -123,3 +123,7 @@ Chart columns are keyboard-accessible buttons. Tapping a logged day reveals its 
 ## Spending trends, 2026-10-19
 
 Trends has a right-aligned 44px SVG money toggle; spending mode offers a pouch icon to return. Each mode browses seven-day windows bounded by its own earliest record; switching resets to today. Spending charts actual daily purchase totals, with Week (selected seven-day total) and Month (calendar month through the selected end date) beneath Spending averages per requested copy. These are totals, not statistical averages. Nicotine trends omit the former monthly purchase row.
+
+## Trends section dividers and missing purchases, 2026-10-19
+
+Place the divider above each averages heading, between chart and summary, with no bottom border under summary totals. Spending days without a purchase record display the same dash as missing pouch days; a recorded zero-dollar purchase still displays $0.00. Calculations remain unchanged.

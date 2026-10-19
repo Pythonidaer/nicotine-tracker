@@ -219,3 +219,6 @@ body { margin: 0; background: var(--p-bg); color: var(--p-fg); }
 #pouch-preview .trend-day .bar { display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
 #pouch-preview .bar-nicotine { color: var(--p-on); font: 400 11px/1.1 var(--p-heading); white-space: nowrap; }
 #pouch-preview .bar-nicotine[hidden] { display: none; }
+
+#pouch-preview .trend-averages-heading { border-top: 1px solid var(--p-line); padding-top: 16px; }
+#pouch-preview .totals.trend-averages { border-bottom: 0; }
