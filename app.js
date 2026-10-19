@@ -19,7 +19,64 @@ const persist=()=>{try{localStorage.setItem('pouch-tracker-v1',JSON.stringify({v
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const money=n=>'$'+n.toFixed(2),time=()=>new Date().toLocaleTimeString([], {hour:'numeric',minute:'2-digit'});
 const items=()=>[...entries,...purchases].sort((a,b)=>b.id-a.id);
-function rows(list){return list.map(e=>`<div class="entry"><div>${e.type==='pouch'?`${esc(e.brand)} · ${e.mg} mg`:e.type==='craving'?`Craving · ${e.intensity}/5`:`${esc(e.brand)} · ${e.tins} tin${e.tins>1?'s':''}`}<small>${esc(e.time)}${e.replacement?' · '+esc(e.replacement):''}</small></div>${e.type==='purchase'?`<span>${money(e.amount)}</span>`:''}<button class="link" data-delete="${e.id}" aria-label="Delete entry">Delete</button></div>`).join('')||'<div class="empty">No entries yet.</div>'}
+const entryChevron='<svg class="chevron" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>';
+const findEntry=id=>[...entries,...purchases].find(entry=>entry.id===id);
+const validOptionalNote=entry=>entry.note===undefined||(typeof entry.note==='string'&&entry.note.length<=1000);
+function rows(list){
+  return list.map(entry=>{
+    const title=entry.type==='pouch'?`${esc(entry.brand)} · ${entry.mg} mg`:entry.type==='craving'?`Craving · ${entry.intensity}/5`:`${esc(entry.brand)} · ${entry.tins} tin${entry.tins>1?'s':''}`;
+    return `<details class="entry history-entry" data-entry-id="${entry.id}" name="entry-options">
+      <summary><span class="entry-description">${title}<small>${esc(entry.time)}${entry.replacement?' · '+esc(entry.replacement):''}${entry.note?' · Note added':''}</small></span><span class="entry-cost">${entry.type==='purchase'?money(entry.amount):''}</span>${entryChevron}</summary>
+      <div class="entry-details">
+        ${entry.note?`<p class="entry-note">${esc(entry.note)}</p>`:''}
+        <div class="entry-actions"><button type="button" class="link" data-note="${entry.id}">${entry.note?'Edit note':'Add note'}</button><button type="button" class="link" data-delete="${entry.id}" aria-label="Delete entry">Delete</button></div>
+        <form class="note-form" data-kind="note" data-id="${entry.id}" hidden>
+          <label for="note-${entry.id}">Note</label><textarea id="note-${entry.id}" name="note" rows="2" maxlength="1000">${esc(entry.note||'')}</textarea>
+          <div class="note-buttons"><button type="submit" class="primary">Save note</button><button type="button" data-note-cancel="${entry.id}">Cancel</button></div>
+        </form>
+        <p class="note-status" role="status" aria-live="polite"></p>
+      </div>
+    </details>`;
+  }).join('')||'<div class="empty">No entries yet.</div>';
+}
+function editEntryNote(button,editing){
+  const row=button.closest('.history-entry');
+  const editor=row.querySelector('.note-form');
+  editor.hidden=!editing;
+  row.querySelector('.entry-actions').hidden=editing;
+  const preview=row.querySelector('.entry-note');
+  if(preview)preview.hidden=editing;
+  if(editing){editor.elements.note.focus();return;}
+  editor.elements.note.value=findEntry(Number(row.dataset.entryId))?.note||'';
+  row.querySelector('[data-note]').focus();
+}
+function saveEntryNote(form){
+  const id=Number(form.dataset.id),entry=findEntry(id);
+  if(!entry)return;
+  const note=form.elements.note.value.trim();
+  if(note.length>1000){form.elements.note.setCustomValidity('Keep your note to 1,000 characters or fewer.');form.elements.note.reportValidity();return;}
+  form.elements.note.setCustomValidity('');
+  const previous=entry.note;
+  if(note)entry.note=note;else delete entry.note;
+  if(!persist()){if(previous===undefined)delete entry.note;else entry.note=previous;return;}
+  render();
+  const row=content.querySelector(`[data-entry-id="${id}"]`);
+  if(row){
+    const recent=row.closest('.recent');if(recent)recent.open=true;
+    row.open=true;
+    row.querySelector('.note-status').textContent=note?'Note saved.':'Note cleared.';
+    row.querySelector('[data-note]').focus({preventScroll:true});
+  }
+}
+function scrollToResourceSection(link){
+  const id=link.getAttribute('href').slice(1),section=document.getElementById(id);
+  if(!section||!content.contains(section))return;
+  const heading=section.querySelector('h2');
+  if(heading){heading.setAttribute('tabindex','-1');heading.focus({preventScroll:true});}
+  const reducedMotion=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  section.scrollIntoView({behavior:reducedMotion?'instant':'smooth',block:'start'});
+}
+
 function render(){
 root.querySelectorAll('nav button').forEach(b=>b.dataset.view===view?b.setAttribute('aria-current','page'):b.removeAttribute('aria-current'));
 const today=localDate(new Date()),week=new Date();week.setHours(0,0,0,0);week.setDate(week.getDate()-((week.getDay()+6)%7));const weekKey=localDate(week),month=today.slice(0,7);let total=entries.filter(e=>e.type==='pouch'&&e.date===today),spent=purchases.filter(p=>p.date>=weekKey&&p.date<=today).reduce((s,p)=>s+p.amount,0),monthSpent=purchases.filter(p=>p.date.startsWith(month)&&p.date<=today).reduce((s,p)=>s+p.amount,0);
@@ -68,9 +125,10 @@ try{
   location.reload();
 }catch(error){status.textContent=error.message||'Could not update. Check your connection and try again.';button.disabled=false;}
 }
-root.addEventListener('click',e=>{const b=e.target.closest('button, .brand');if(!b)return;if(b.dataset.view){e.preventDefault();setMenuOpen(false);view=b.dataset.view;notice='';render();content.focus({preventScroll:true});window.scrollTo({top:0,behavior:'instant'});return}if(b.dataset.delete){const id=Number(b.dataset.delete);entries=entries.filter(x=>x.id!==id);purchases=purchases.filter(x=>x.id!==id);persist();notice='';render();return}const a=b.dataset.action;if(a==='update'){updateApp(b);return}if(a==='pouch'){lastAdded=Date.now();entries.unshift({id:lastAdded,type:'pouch',...product,date:localDate(new Date()),time:time()});persist();notice='Pouch logged';render()}else if(a==='undo'){entries=entries.filter(e=>e.id!==lastAdded);persist();notice='';render()}else if(a==='export'){const blob=new Blob([JSON.stringify({version:1,product,entries,purchases},null,2)],{type:'application/json'});const url=URL.createObjectURL(blob),link=document.createElement('a');link.href=url;link.download='pouch-tracker-backup.json';link.click();setTimeout(()=>URL.revokeObjectURL(url),1000)}else if(a==='restore'){root.querySelector('#backup-file').click()}else if(a==='cancel')render();else if(a)form(a)});
-root.addEventListener('submit',e=>{e.preventDefault();const f=e.target,d=new FormData(f),kind=f.dataset.kind;if(kind==='product')product={brand:d.get('brand'),mg:Number(d.get('mg'))};else if(kind==='craving')entries.unshift({id:Date.now(),type:kind,intensity:Number(d.get('intensity')),replacement:d.get('replacement'),time:time()});else purchases.unshift({id:Date.now(),type:kind,brand:d.get('brand'),tins:Number(d.get('tins')),amount:Number(d.get('amount')),date:d.get('date'),time:d.get('date')});persist();render()});
-root.addEventListener('change',async e=>{if(e.target.id!=='backup-file'||!e.target.files[0])return;try{const d=JSON.parse(await e.target.files[0].text());const strengths=[3,6,9,11,12,15],brands=['On!','Velo','Zyn'];if(d.version!==1||!brands.includes(d.product?.brand)||!strengths.includes(d.product?.mg)||!Array.isArray(d.entries)||!Array.isArray(d.purchases))throw Error();if(!d.entries.every(x=>x.type==='pouch'&&brands.includes(x.brand)&&strengths.includes(x.mg)&&Number.isFinite(x.id)&&/^\d{4}-\d{2}-\d{2}$/.test(x.date)&&typeof x.time==='string')||!d.purchases.every(x=>x.type==='purchase'&&brands.includes(x.brand)&&Number.isFinite(x.id)&&Number.isInteger(x.tins)&&x.tins>0&&Number.isFinite(x.amount)&&x.amount>=0&&/^\d{4}-\d{2}-\d{2}$/.test(x.date)&&typeof x.time==='string'))throw Error();if(!confirm('Replace device logs with this backup?'))return;product=d.product;entries=d.entries;purchases=d.purchases;persist();render();alert('Backup restored.')}catch{alert('This is not a valid Pouch Tracker backup.')}});
+root.addEventListener('click',e=>{const articleLink=e.target.closest('.resource-contents a[href^="#"]');if(articleLink){e.preventDefault();scrollToResourceSection(articleLink);return;}const b=e.target.closest('button, .brand');if(!b)return;if(b.dataset.note){editEntryNote(b,true);return;}if(b.dataset.noteCancel){editEntryNote(b,false);return;}if(b.dataset.view){e.preventDefault();setMenuOpen(false);view=b.dataset.view;notice='';render();content.focus({preventScroll:true});window.scrollTo({top:0,behavior:'instant'});return}if(b.dataset.delete){const id=Number(b.dataset.delete);entries=entries.filter(x=>x.id!==id);purchases=purchases.filter(x=>x.id!==id);persist();notice='';render();return}const a=b.dataset.action;if(a==='update'){updateApp(b);return}if(a==='pouch'){lastAdded=Date.now();entries.unshift({id:lastAdded,type:'pouch',...product,date:localDate(new Date()),time:time()});persist();notice='Pouch logged';render()}else if(a==='undo'){entries=entries.filter(e=>e.id!==lastAdded);persist();notice='';render()}else if(a==='export'){const blob=new Blob([JSON.stringify({version:1,product,entries,purchases},null,2)],{type:'application/json'});const url=URL.createObjectURL(blob),link=document.createElement('a');link.href=url;link.download='pouch-tracker-backup.json';link.click();setTimeout(()=>URL.revokeObjectURL(url),1000)}else if(a==='restore'){root.querySelector('#backup-file').click()}else if(a==='cancel')render();else if(a)form(a)});
+root.addEventListener('input',e=>{if(e.target.matches('.note-form textarea'))e.target.setCustomValidity('')});
+root.addEventListener('submit',e=>{e.preventDefault();const f=e.target,d=new FormData(f),kind=f.dataset.kind;if(kind==='note'){saveEntryNote(f);return;}if(kind==='product')product={brand:d.get('brand'),mg:Number(d.get('mg'))};else if(kind==='craving')entries.unshift({id:Date.now(),type:kind,intensity:Number(d.get('intensity')),replacement:d.get('replacement'),time:time()});else purchases.unshift({id:Date.now(),type:kind,brand:d.get('brand'),tins:Number(d.get('tins')),amount:Number(d.get('amount')),date:d.get('date'),time:d.get('date')});persist();render()});
+root.addEventListener('change',async e=>{if(e.target.id!=='backup-file'||!e.target.files[0])return;try{const d=JSON.parse(await e.target.files[0].text());const strengths=[3,6,9,11,12,15],brands=['On!','Velo','Zyn'];if(d.version!==1||!brands.includes(d.product?.brand)||!strengths.includes(d.product?.mg)||!Array.isArray(d.entries)||!Array.isArray(d.purchases))throw Error();if(!d.entries.every(x=>validOptionalNote(x)&&x.type==='pouch'&&brands.includes(x.brand)&&strengths.includes(x.mg)&&Number.isFinite(x.id)&&/^\d{4}-\d{2}-\d{2}$/.test(x.date)&&typeof x.time==='string')||!d.purchases.every(x=>validOptionalNote(x)&&x.type==='purchase'&&brands.includes(x.brand)&&Number.isFinite(x.id)&&Number.isInteger(x.tins)&&x.tins>0&&Number.isFinite(x.amount)&&x.amount>=0&&/^\d{4}-\d{2}-\d{2}$/.test(x.date)&&typeof x.time==='string'))throw Error();if(!confirm('Replace device logs with this backup?'))return;product=d.product;entries=d.entries;purchases=d.purchases;persist();render();alert('Backup restored.')}catch{alert('This is not a valid Pouch Tracker backup.')}});
 render();
 if('serviceWorker' in navigator)navigator.serviceWorker.register('./sw.js');
 })();

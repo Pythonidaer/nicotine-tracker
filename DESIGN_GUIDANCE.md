@@ -39,3 +39,9 @@ Keep the skip link available for keyboard focus, hidden during ordinary touch us
 - All service-worker asset paths resolve to files in the repository, including local fonts and resource copy.
 - Published GitHub Pages was checked in Chrome. Settings → Update app upgraded the previous app shell and preserved a saved test pouch; test data was then removed. Dropdown destinations and the resource guide rendered correctly. Computed heading/body families and non-sticky header position matched the intended design; no horizontal overflow at the inspected desktop width.
 - iPhone narrow-screen appearance, larger text, light/dark mode, and true offline reopening remain for device review. No claim of native Safari verification.
+
+## Compact notes and article navigation, 2026-10-19
+
+History and Recent entries use native details/summary rows with a right-aligned SVG chevron. Controls and optional saved notes stay inside the disclosure on all device sizes. A two-line note editor appears only on request; Save and Cancel operate within the row. The optional note field is included on pouch or purchase records, with a 1,000-character limit. The existing storage key and backup version remain; old backups may omit the field. Notes are escaped as plain text and validated on restore. Failed saves do not display a success message or change the stored note.
+
+Article contents links explicitly scroll to their section instead of relying on fragment navigation inside an installed PWA. Focus moves to the section heading without an extra jump; reduced-motion preferences use instant scrolling.

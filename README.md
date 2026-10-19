@@ -3,7 +3,7 @@
 Compact, offline-first PWA for personal nicotine-pouch logging. No accounts, database, or analytics services. Starts with empty logs. Defaults to Zyn 6 mg until changed in Settings.
 
 ## Features
-Pouch logging and undo; labeled mg totals; actual tin purchases; calendar-week (Monday start) and month spending; history and deletion; seven-day trends; default product settings; validated JSON export/restore.
+Pouch logging and undo; labeled mg totals; actual tin purchases; calendar-week (Monday start) and month spending; collapsed history entries with notes and deletion; seven-day trends; default product settings; validated JSON export/restore.
 
 Data remains in this browser/device. Unlogged days are unknown. Export backups regularly. Labeled mg is product content, not absorbed nicotine.
 
@@ -71,3 +71,9 @@ Read [AGENTS.md](AGENTS.md) and [DESIGN_GUIDANCE.md](DESIGN_GUIDANCE.md). This a
 ## Refresh the installed app
 
 Settings → Update app checks for a service-worker update, refreshes the current app files, and reloads. It requires an internet connection and does not clear localStorage, logs, settings, or backups. There is no need to delete or reinstall the PWA. Export a backup regularly. Older installed versions can receive this Settings action by closing and reopening the app while online.
+
+## Entry notes
+
+In History, expand an entry using the right-hand chevron. Choose Add note or Edit note to reveal a two-line editor; save or cancel without leaving the list. The same controls are available in Recent entries. Notes are optional, up to 1,000 characters, and stored on this device alongside the entry. Saving a blank note clears it. Export/restore includes notes; older version-1 backups without notes still work. Deleting an entry also removes its note.
+
+The resource article's contents links scroll directly to their sections and move keyboard focus to the section heading. Reduced-motion preferences disable smooth scrolling.
