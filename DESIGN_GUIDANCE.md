@@ -127,3 +127,7 @@ Trends has a right-aligned 44px SVG money toggle; spending mode offers a pouch i
 ## Trends section dividers and missing purchases, 2026-10-19
 
 Place the divider above each averages heading, between chart and summary, with no bottom border under summary totals. Spending days without a purchase record display the same dash as missing pouch days; a recorded zero-dollar purchase still displays $0.00. Calculations remain unchanged.
+
+## Product summary punctuation, 2026-10-19
+
+Use commas between brand and strength or tin count in History, Today’s Recent entries and Settings default product: Velo, 6 mg; Velo, 1 tin. This is an approved project preference, not a GOV.UK requirement.
