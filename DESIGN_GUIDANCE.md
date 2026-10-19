@@ -75,3 +75,7 @@ Today mirrors the Add pouch heading/icon treatment with Add purchase and the sam
 ## Default product selectors, 2026-10-19
 
 Settings → Default product → Change uses the same shared brand and nicotine pickers as Add pouch: field-width popup, capped height with scrolling, SVG arrow toggle, selection, keyboard navigation and dismissal. The existing stacked form layout and Save/Cancel behavior remain. Saving sets the defaults for future entries; previous records retain their saved values.
+
+## Read-only Recent entries, 2026-10-19
+
+Today's Recent entries keeps its outer disclosure and shows the latest three pouch entries logged today as plain rows (brand, strength, time and optional activity). No per-record disclosure, chevron, note editor, Edit entry or Delete controls appear there. History retains the full expandable editor and saved notes. No records or notes are modified by this presentation change.
