@@ -103,3 +103,7 @@ Add pouch uses the same form-actions class as Log purchase and default product s
 ## Heading and action-column alignment, 2026-10-19
 
 Recent entries shares the h2 typography/color rule with Add pouch and Add purchase. Its chevron occupies a centered 44px action column; History disclosure rows use the same 44px final grid column and centered accent-colored chevron. Header and main gutters match at both mobile and desktop widths so hamburger, add controls and disclosure chevrons share their horizontal center. Keep actual SVG dimensions and clickable summary behavior unchanged.
+
+## Settings actions, 2026-10-19
+
+Export backup and Restore backup reuse History’s borderless accent-text actions, including the flush-left first action. Update app uses the same filled primary style as Add pouch and Save. Both action rows use the shared 20px top margin and 12px button gap.
