@@ -53,7 +53,7 @@ body { margin: 0; background: var(--p-bg); color: var(--p-fg); }
 #pouch-preview .menu-toggle[aria-expanded="true"] .menu-top { transform: translateY(6px) rotate(45deg); transform-origin: 12px 6px; }
 #pouch-preview .menu-toggle[aria-expanded="true"] .menu-middle { opacity: 0; }
 #pouch-preview .menu-toggle[aria-expanded="true"] .menu-bottom { transform: translateY(-6px) rotate(-45deg); transform-origin: 12px 18px; }
-#pouch-preview main { flex: 1; min-height: 320px; padding: 16px; scroll-margin-top: 16px; }
+#pouch-preview main { min-width: 0; flex: 1; min-height: 320px; padding: 16px; scroll-margin-top: 16px; }
 #pouch-preview main:focus { outline: none; }
 #pouch-preview h2 { font-family: var(--p-heading); font-size: 21px; line-height: 1.25; font-weight: 400; margin: 0 0 8px; }
 #pouch-preview h3 { font-family: var(--p-heading); font-size: 18px; line-height: 1.3; font-weight: 400; margin: 16px 0 4px; }
@@ -183,3 +183,18 @@ body { margin: 0; background: var(--p-bg); color: var(--p-fg); }
 #pouch-preview .purchase-section { margin-top: 12px; }
 #pouch-preview .spending-totals { border-bottom: 0; padding-bottom: 0; }
 #pouch-preview .spending-totals .value { overflow-wrap: anywhere; }
+
+/* Keep Safari's intrinsic date-control width inside the form. */
+#pouch-preview form { min-width: 0; max-width: 100%; }
+#pouch-preview input[type="date"] {
+  -webkit-appearance: none;
+  appearance: none;
+  display: block;
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  min-inline-size: 0;
+  text-align: left;
+}
+#pouch-preview input[type="date"]::-webkit-date-and-time-value { min-width: 0; text-align: left; }

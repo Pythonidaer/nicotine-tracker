@@ -83,3 +83,7 @@ Today's Recent entries keeps its outer disclosure and shows the latest three pou
 ## Purchase brand selector, 2026-10-19
 
 Log purchase uses the shared compact Brand picker, matching Add pouch, default product settings and History editing. Preserve the existing purchase fields, default selection and save calculations.
+
+## Purchase date width, 2026-10-19
+
+Native date inputs explicitly use border-box sizing, zero intrinsic minimum width, full available width and a 100% maximum. Remove Safari's default appearance while retaining the native date input/picker; align its displayed value left. Forms and main content can shrink within their available width. Apply the same rule to Log purchase and History purchase editing. Do not hide page overflow as a substitute for correct control sizing. Actual iPhone Safari/PWA verification remains required.
