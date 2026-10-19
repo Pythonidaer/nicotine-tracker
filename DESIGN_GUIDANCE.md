@@ -131,3 +131,7 @@ Place the divider above each averages heading, between chart and summary, with n
 ## Product summary punctuation, 2026-10-19
 
 Use commas between brand and strength or tin count in History, Today’s Recent entries and Settings default product: Velo, 6 mg; Velo, 1 tin. This is an approved project preference, not a GOV.UK requirement.
+
+## Purchase tin reveal, 2026-10-19
+
+Spending chart columns reuse the nicotine chart’s accessible tap toggle to reveal summed tins bought on that date, with singular/plural labels. Multiple purchases on one date are combined for display only. Missing-purchase days remain disabled.
