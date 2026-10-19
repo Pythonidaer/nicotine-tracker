@@ -17,32 +17,36 @@ let lastAdded=null,pouchFormOpen=false,feedbackTimer=null;
 const activityOptions=['Working at kiosk','Concentrating on computer','At comedy','At a movie','At home','After eating','Traveling','Taking a break','Socializing','After waking up','Other'];
 const addEntryIcon='<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M12 8v8M8 12h8"/></svg>';
 const closeEntryIcon='<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg>';
+const pickerChevron='<svg class="chevron" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>';
+function entryPicker(name,label,options,value){
+  const selected=options.find(option=>option.value===String(value));
+  return `<label id="${name}-label" for="${name}-trigger">${label}</label>
+    <div class="entry-picker" data-picker="${name}">
+      <select id="entry-${name}" name="${name}" hidden aria-hidden="true" tabindex="-1">${options.map(option=>`<option value="${esc(option.value)}" ${option.value===String(value)?'selected':''}>${esc(option.label)}</option>`).join('')}</select>
+      <button type="button" class="picker-trigger" id="${name}-trigger" aria-haspopup="listbox" aria-expanded="false" aria-controls="${name}-options" aria-labelledby="${name}-label ${name}-value"><span class="picker-value" id="${name}-value">${esc(selected.label)}</span>${pickerChevron}</button>
+      <div class="picker-options" id="${name}-options" role="listbox" aria-labelledby="${name}-label" hidden>${options.map(option=>`<button type="button" role="option" tabindex="-1" aria-selected="${option.value===String(value)}" data-picker-value="${esc(option.value)}">${esc(option.label)}</button>`).join('')}</div>
+    </div>`;
+}
 function pouchEntryMarkup(){
   const fields=pouchFormOpen?`<form data-kind="pouch" class="pouch-form">
-    <div class="pouch-product-fields"><div><label for="entry-brand">Brand</label><select id="entry-brand" name="brand" required>${['On!','Velo','Zyn'].map(brand=>`<option ${brand===product.brand?'selected':''}>${brand}</option>`).join('')}</select></div>
-    <div><label for="entry-mg">Nicotine per pouch</label><select id="entry-mg" name="mg" required>${[3,6,9,11,12,15].map(mg=>`<option value="${mg}" ${mg===product.mg?'selected':''}>${mg} mg</option>`).join('')}</select></div></div>
-    <label id="activity-label" for="activity-trigger">What are you doing? (optional)</label>
-    <div class="activity-picker">
-      <select id="entry-activity" name="activity" hidden aria-hidden="true" tabindex="-1"><option value="">Not specified</option>${activityOptions.map(activity=>`<option>${activity}</option>`).join('')}</select>
-      <button type="button" id="activity-trigger" aria-haspopup="listbox" aria-expanded="false" aria-controls="activity-options" aria-labelledby="activity-label activity-value"><span id="activity-value">Not specified</span><svg class="chevron" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
-      <div id="activity-options" role="listbox" aria-labelledby="activity-label" hidden>${['',...activityOptions].map((activity,index)=>`<button type="button" role="option" tabindex="-1" aria-selected="${index===0}" data-activity="${activity}">${activity||'Not specified'}</button>`).join('')}</div>
-    </div>
+    <div class="pouch-product-fields"><div>${entryPicker('brand','Brand',['On!','Velo','Zyn'].map(value=>({value,label:value})),product.brand)}</div>
+    <div>${entryPicker('mg','Nicotine per pouch',[3,6,9,11,12,15].map(mg=>({value:String(mg),label:`${mg} mg`})),product.mg)}</div></div>
+    ${entryPicker('activity','What are you doing? (optional)',['',...activityOptions].map(value=>({value,label:value||'Not specified'})),'')}
     <div class="pouch-form-actions"><button type="submit" class="primary">Add pouch</button><button type="button" data-action="cancel-pouch">Cancel</button></div>
   </form>`:'';
   return `<section class="pouch-entry" aria-labelledby="pouch-entry-title"><div class="row pouch-entry-heading"><h2 id="pouch-entry-title">Add pouch</h2>
     ${notice?`<div class="pouch-feedback" role="status" aria-live="polite">${notice}<button type="button" class="link" data-action="undo">Undo</button></div>`:`<button type="button" class="add-entry-icon" data-action="open-pouch" aria-label="${pouchFormOpen?'Close pouch entry':'Add pouch entry'}" aria-expanded="${pouchFormOpen}" aria-controls="pouch-entry-form">${pouchFormOpen?closeEntryIcon:addEntryIcon}</button>`}
   </div><div id="pouch-entry-form" ${pouchFormOpen?'':'hidden'}>${fields}</div></section>`;
 }
-// Keep the activity popup bounded and inside the available viewport space.
-function closeActivityPicker(restoreFocus=false){
-  const list=content.querySelector('#activity-options'),trigger=content.querySelector('#activity-trigger');
-  if(!list||!trigger)return;
-  list.hidden=true;trigger.setAttribute('aria-expanded','false');
+// All entry fields share the same bounded popup and dismissal behavior.
+function closeEntryPicker(picker,restoreFocus=false){
+  picker.querySelector('.picker-options').hidden=true;
+  const trigger=picker.querySelector('.picker-trigger');trigger.setAttribute('aria-expanded','false');
   if(restoreFocus)trigger.focus({preventScroll:true});
 }
-function openActivityPicker(edge){
-  const list=content.querySelector('#activity-options'),trigger=content.querySelector('#activity-trigger');
-  if(!list||!trigger)return;
+function openEntryPicker(picker,edge){
+  content.querySelectorAll('.entry-picker').forEach(other=>{if(other!==picker)closeEntryPicker(other)});
+  const list=picker.querySelector('.picker-options'),trigger=picker.querySelector('.picker-trigger');
   const rect=trigger.getBoundingClientRect(),viewport=window.visualViewport;
   const viewportTop=viewport?.offsetTop||0,viewportBottom=viewportTop+(viewport?.height||window.innerHeight);
   const below=viewportBottom-rect.bottom-12,above=rect.top-viewportTop-12;
@@ -54,37 +58,52 @@ function openActivityPicker(edge){
   const option=edge==='first'?options[0]:edge==='last'?options.at(-1):list.querySelector('[aria-selected="true"]');
   option.focus({preventScroll:true});option.scrollIntoView?.({block:'nearest'});
 }
+let pressedPickerTrigger=null,pressedPickerWasOpen=false;
+document.addEventListener('pointerdown',event=>{
+  pressedPickerTrigger=event.target.closest('.picker-trigger');
+  pressedPickerWasOpen=pressedPickerTrigger?.getAttribute('aria-expanded')==='true';
+  const targetPicker=event.target.closest('.entry-picker');
+  content.querySelectorAll('.entry-picker').forEach(picker=>{if(picker!==targetPicker)closeEntryPicker(picker)});
+});
 root.addEventListener('click',event=>{
-  if(event.target.closest('#activity-trigger')){
-    const open=content.querySelector('#activity-trigger').getAttribute('aria-expanded')==='true';
-    if(open)closeActivityPicker(true);else openActivityPicker();
+  const trigger=event.target.closest('.picker-trigger');
+  if(trigger){
+    const picker=trigger.closest('.entry-picker');
+    // Preserve the state at touch-down even if mobile focus changes before click.
+    const wasOpen=trigger===pressedPickerTrigger?pressedPickerWasOpen:trigger.getAttribute('aria-expanded')==='true';
+    pressedPickerTrigger=null;
+    if(wasOpen)closeEntryPicker(picker,true);else openEntryPicker(picker);
   }
-  const option=event.target.closest('[data-activity]');
+  const option=event.target.closest('[data-picker-value]');
   if(option){
-    const select=content.querySelector('#entry-activity');select.value=option.dataset.activity;
-    content.querySelector('#activity-value').textContent=option.textContent;
-    content.querySelectorAll('[data-activity]').forEach(item=>item.setAttribute('aria-selected',String(item===option)));
-    select.dispatchEvent(new Event('change',{bubbles:true}));closeActivityPicker(true);
+    const picker=option.closest('.entry-picker'),select=picker.querySelector('select');select.value=option.dataset.pickerValue;
+    picker.querySelector('.picker-value').textContent=option.textContent;
+    picker.querySelectorAll('[role="option"]').forEach(item=>item.setAttribute('aria-selected',String(item===option)));
+    select.dispatchEvent(new Event('change',{bubbles:true}));closeEntryPicker(picker,true);
   }
 });
-document.addEventListener('pointerdown',event=>{if(!event.target.closest('.activity-picker'))closeActivityPicker()});
-root.addEventListener('focusout',event=>{if(event.target.closest('.activity-picker')&&!event.relatedTarget?.closest('.activity-picker'))closeActivityPicker()});
-let activitySearch='',activitySearchTime=0;
+root.addEventListener('focusout',event=>{
+  const picker=event.target.closest('.entry-picker');
+  // iOS may report a null target during a tap. Outside taps are handled above.
+  if(picker&&event.relatedTarget&&!picker.contains(event.relatedTarget))closeEntryPicker(picker);
+});
+let pickerSearch='',pickerSearchTime=0;
 root.addEventListener('keydown',event=>{
-  const picker=event.target.closest('.activity-picker');if(!picker)return;
-  const list=picker.querySelector('[role="listbox"]'),options=[...list.querySelectorAll('[role="option"]')];
-  if(event.key==='Escape'&&!list.hidden){event.preventDefault();closeActivityPicker(true);return;}
-  if(event.key==='Tab'){closeActivityPicker();picker.querySelector('#activity-trigger').focus({preventScroll:true});return;}
+  const picker=event.target.closest('.entry-picker');if(!picker)return;
+  pressedPickerTrigger=null;
+  const list=picker.querySelector('.picker-options'),options=[...list.querySelectorAll('[role="option"]')];
+  if(event.key==='Escape'&&!list.hidden){event.preventDefault();closeEntryPicker(picker,true);return;}
+  if(event.key==='Tab'){closeEntryPicker(picker,true);return;}
   if(['ArrowDown','ArrowUp','Home','End'].includes(event.key)){
     event.preventDefault();
-    if(list.hidden){openActivityPicker(event.key==='Home'?'first':event.key==='End'?'last':undefined);return;}
+    if(list.hidden){openEntryPicker(picker,event.key==='Home'?'first':event.key==='End'?'last':undefined);return;}
     const index=options.indexOf(document.activeElement);
     const next=event.key==='Home'?0:event.key==='End'?options.length-1:Math.max(0,Math.min(options.length-1,index+(event.key==='ArrowDown'?1:-1)));
     options[next].focus({preventScroll:true});options[next].scrollIntoView?.({block:'nearest'});
   }else if(event.key.length===1&&!event.ctrlKey&&!event.metaKey&&!event.altKey&&event.key!==' '){
-    event.preventDefault();if(list.hidden)openActivityPicker();
-    const now=Date.now();activitySearch=now-activitySearchTime>700?event.key:activitySearch+event.key;activitySearchTime=now;
-    const match=options.find(option=>option.textContent.toLowerCase().startsWith(activitySearch.toLowerCase()));
+    event.preventDefault();if(list.hidden)openEntryPicker(picker);
+    const now=Date.now();pickerSearch=now-pickerSearchTime>700?event.key:pickerSearch+event.key;pickerSearchTime=now;
+    const match=options.find(option=>option.textContent.toLowerCase().startsWith(pickerSearch.toLowerCase()));
     if(match){match.focus({preventScroll:true});match.scrollIntoView?.({block:'nearest'});}
   }
 });
@@ -226,7 +245,7 @@ try{
   location.reload();
 }catch(error){status.textContent=error.message||'Could not update. Check your connection and try again.';button.disabled=false;}
 }
-root.addEventListener('click',e=>{const articleLink=e.target.closest('.resource-contents a[href^="#"]');if(articleLink){e.preventDefault();scrollToResourceSection(articleLink);return;}const b=e.target.closest('button, .brand');if(!b)return;if(b.dataset.note){editEntryNote(b,true);return;}if(b.dataset.noteCancel){editEntryNote(b,false);return;}if(b.dataset.view){e.preventDefault();setMenuOpen(false);view=b.dataset.view;notice='';pouchFormOpen=false;clearTimeout(feedbackTimer);render();content.focus({preventScroll:true});window.scrollTo({top:0,behavior:'instant'});return}if(b.dataset.delete){const id=Number(b.dataset.delete);entries=entries.filter(x=>x.id!==id);purchases=purchases.filter(x=>x.id!==id);persist();notice='';render();return}const a=b.dataset.action;if(a==='update'){updateApp(b);return}if(a==='open-pouch'){if(pouchFormOpen){closePouchEntry();return;}pouchFormOpen=true;notice='';clearTimeout(feedbackTimer);render();content.querySelector('#entry-brand').focus({preventScroll:true});}else if(a==='cancel-pouch'){closePouchEntry();}else if(a==='undo'){const previous=entries;entries=entries.filter(e=>e.id!==lastAdded);if(!persist()){entries=previous;return;}closePouchEntry();}else if(a==='export'){const blob=new Blob([JSON.stringify({version:1,product,entries,purchases},null,2)],{type:'application/json'});const url=URL.createObjectURL(blob),link=document.createElement('a');link.href=url;link.download='pouch-tracker-backup.json';link.click();setTimeout(()=>URL.revokeObjectURL(url),1000)}else if(a==='restore'){root.querySelector('#backup-file').click()}else if(a==='cancel')render();else if(a)form(a)});
+root.addEventListener('click',e=>{const articleLink=e.target.closest('.resource-contents a[href^="#"]');if(articleLink){e.preventDefault();scrollToResourceSection(articleLink);return;}const b=e.target.closest('button, .brand');if(!b)return;if(b.dataset.note){editEntryNote(b,true);return;}if(b.dataset.noteCancel){editEntryNote(b,false);return;}if(b.dataset.view){e.preventDefault();setMenuOpen(false);view=b.dataset.view;notice='';pouchFormOpen=false;clearTimeout(feedbackTimer);render();content.focus({preventScroll:true});window.scrollTo({top:0,behavior:'instant'});return}if(b.dataset.delete){const id=Number(b.dataset.delete);entries=entries.filter(x=>x.id!==id);purchases=purchases.filter(x=>x.id!==id);persist();notice='';render();return}const a=b.dataset.action;if(a==='update'){updateApp(b);return}if(a==='open-pouch'){if(pouchFormOpen){closePouchEntry();return;}pouchFormOpen=true;notice='';clearTimeout(feedbackTimer);render();content.querySelector('[data-action="open-pouch"]').focus({preventScroll:true});}else if(a==='cancel-pouch'){closePouchEntry();}else if(a==='undo'){const previous=entries;entries=entries.filter(e=>e.id!==lastAdded);if(!persist()){entries=previous;return;}closePouchEntry();}else if(a==='export'){const blob=new Blob([JSON.stringify({version:1,product,entries,purchases},null,2)],{type:'application/json'});const url=URL.createObjectURL(blob),link=document.createElement('a');link.href=url;link.download='pouch-tracker-backup.json';link.click();setTimeout(()=>URL.revokeObjectURL(url),1000)}else if(a==='restore'){root.querySelector('#backup-file').click()}else if(a==='cancel')render();else if(a)form(a)});
 root.addEventListener('input',e=>{if(e.target.matches('.note-form textarea'))e.target.setCustomValidity('')});
 root.addEventListener('submit',e=>{e.preventDefault();const f=e.target,d=new FormData(f),kind=f.dataset.kind;if(kind==='pouch'){addPouchFromForm(f);return;}if(kind==='note'){saveEntryNote(f);return;}if(kind==='product')product={brand:d.get('brand'),mg:Number(d.get('mg'))};else if(kind==='craving')entries.unshift({id:Date.now(),type:kind,intensity:Number(d.get('intensity')),replacement:d.get('replacement'),time:time()});else purchases.unshift({id:Date.now(),type:kind,brand:d.get('brand'),tins:Number(d.get('tins')),amount:Number(d.get('amount')),date:d.get('date'),time:d.get('date')});persist();render()});
 root.addEventListener('change',async e=>{if(e.target.id!=='backup-file'||!e.target.files[0])return;try{const d=JSON.parse(await e.target.files[0].text());const strengths=[3,6,9,11,12,15],brands=['On!','Velo','Zyn'];if(d.version!==1||!brands.includes(d.product?.brand)||!strengths.includes(d.product?.mg)||!Array.isArray(d.entries)||!Array.isArray(d.purchases))throw Error();if(!d.entries.every(x=>validOptionalNote(x)&&validOptionalActivity(x)&&x.type==='pouch'&&brands.includes(x.brand)&&strengths.includes(x.mg)&&Number.isFinite(x.id)&&/^\d{4}-\d{2}-\d{2}$/.test(x.date)&&typeof x.time==='string')||!d.purchases.every(x=>validOptionalNote(x)&&validOptionalActivity(x)&&x.type==='purchase'&&brands.includes(x.brand)&&Number.isFinite(x.id)&&Number.isInteger(x.tins)&&x.tins>0&&Number.isFinite(x.amount)&&x.amount>=0&&/^\d{4}-\d{2}-\d{2}$/.test(x.date)&&typeof x.time==='string'))throw Error();if(!confirm('Replace device logs with this backup?'))return;product=d.product;entries=d.entries;purchases=d.purchases;persist();render();alert('Backup restored.')}catch{alert('This is not a valid Pouch Tracker backup.')}});

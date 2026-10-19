@@ -55,3 +55,7 @@ Optional activity is plain text on the entry, displayed with its timestamp and v
 ## Compact activity menu, 2026-10-19
 
 The activity field uses a custom button/listbox to avoid the oversized iOS native select popup. Its opaque popup matches the field width, shows at most 220px of options, and scrolls internally; it opens above when space below is limited. Brand and strength keep their native controls. Support selection, selected state, arrows/Home/End, typing to find an option, Escape, Tab, outside dismissal and focus return. Activity stays optional and uses the same saved value and backup format. Check touch scrolling and VoiceOver on an actual iPhone.
+
+## Shared entry selectors, 2026-10-19
+
+Brand, nicotine strength and activity now share one field-width, scrollable picker component. Brand and strength retain their two-column layout. Opening Add pouch keeps focus on the disclosure control and opens no picker. Tapping any trigger or its SVG arrow toggles its popup; pointer-down state prevents mobile focus changes from closing and immediately reopening it. Only one picker opens at a time. Outside taps, selection, Escape and Tab close it. Hidden selects keep form submission and the existing saved values unchanged.
