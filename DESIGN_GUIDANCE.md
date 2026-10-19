@@ -119,3 +119,7 @@ Previous/next SVG controls move the chart and paired pouch/nicotine daily averag
 ## Daily nicotine reveal, 2026-10-19
 
 Chart columns are keyboard-accessible buttons. Tapping a logged day reveals its summed nicotine in mg inside the bar; tapping again hides it, and choosing another day closes the prior reveal. Missing days stay disabled. Navigating periods resets the reveal. Chart is a labelled group rather than an image so controls remain accessible.
+
+## Spending trends, 2026-10-19
+
+Trends has a right-aligned 44px SVG money toggle; spending mode offers a pouch icon to return. Each mode browses seven-day windows bounded by its own earliest record; switching resets to today. Spending charts actual daily purchase totals, with Week (selected seven-day total) and Month (calendar month through the selected end date) beneath Spending averages per requested copy. These are totals, not statistical averages. Nicotine trends omit the former monthly purchase row.
