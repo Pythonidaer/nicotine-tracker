@@ -79,3 +79,7 @@ Settings → Default product → Change uses the same shared brand and nicotine 
 ## Read-only Recent entries, 2026-10-19
 
 Today's Recent entries keeps its outer disclosure and shows the latest three pouch entries logged today as plain rows (brand, strength, time and optional activity). No per-record disclosure, chevron, note editor, Edit entry or Delete controls appear there. History retains the full expandable editor and saved notes. No records or notes are modified by this presentation change.
+
+## Purchase brand selector, 2026-10-19
+
+Log purchase uses the shared compact Brand picker, matching Add pouch, default product settings and History editing. Preserve the existing purchase fields, default selection and save calculations.
