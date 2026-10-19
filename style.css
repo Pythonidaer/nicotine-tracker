@@ -214,3 +214,8 @@ body { margin: 0; background: var(--p-bg); color: var(--p-fg); }
 #pouch-preview .trend-period { display: grid; grid-template-columns: 44px minmax(0, 1fr) 44px; align-items: center; gap: 4px; text-align: center; }
 #pouch-preview .trend-period button { display: grid; place-items: center; padding: 8px; }
 #pouch-preview .trend-period button:disabled { opacity: .3; cursor: default; }
+
+#pouch-preview button.trend-day { padding: 0; border: 0; border-radius: 0; background: transparent; color: var(--p-fg); font-family: var(--p-body); font-size: 12px; }
+#pouch-preview .trend-day .bar { display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+#pouch-preview .bar-nicotine { color: var(--p-on); font: 400 11px/1.1 var(--p-heading); white-space: nowrap; }
+#pouch-preview .bar-nicotine[hidden] { display: none; }

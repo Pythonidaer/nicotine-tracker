@@ -115,3 +115,7 @@ History, Trends and Settings retain the shared 21px h2 type and now use Today’
 ## Browsable seven-day trends, 2026-10-19
 
 Previous/next SVG controls move the chart and paired pouch/nicotine daily averages through consecutive seven-day windows ending today. Date ranges identify the selected window; navigation stops at the earliest pouch and today. Incomplete windows average only days with logs, avoiding assumed zero-use days. Per user request, omit the explanatory days-with-logs line; the chart retains missing-day markers. Chart heights scale to the selected maximum rather than clipping high counts. Remove the Unlogged day footer; accessible chart descriptions still identify missing logs.
+
+## Daily nicotine reveal, 2026-10-19
+
+Chart columns are keyboard-accessible buttons. Tapping a logged day reveals its summed nicotine in mg inside the bar; tapping again hides it, and choosing another day closes the prior reveal. Missing days stay disabled. Navigating periods resets the reveal. Chart is a labelled group rather than an image so controls remain accessible.
