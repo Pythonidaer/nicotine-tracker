@@ -67,3 +67,7 @@ History/Recent entries omit the Note added suffix. Edit entry replaces the note-
 ## Weekly history, 2026-10-19
 
 History groups saved records by Monday–Sunday calendar weeks, newest first, using each record's saved local date. Each nonempty week has a date-range heading and 28px separation from the next group. History rows include weekday/date before time to distinguish days within a week; Recent entries retain time-only labels. Pouches and purchases remain together. Grouping never combines or removes records, including identical-looking logs. Editing a purchase date moves that record to its matching week.
+
+## Purchase section, 2026-10-19
+
+Today mirrors the Add pouch heading/icon treatment with Add purchase and the same right-aligned SVG add control. The existing purchase form opens from this icon. Spending uses the Summary two-column totals treatment: actual purchase amounts above Week and Month captions. No estimated consumption costs or changes to week/month calculations.

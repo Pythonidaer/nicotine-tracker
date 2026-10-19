@@ -179,3 +179,7 @@ body { margin: 0; background: var(--p-bg); color: var(--p-fg); }
 
 #pouch-preview .history-week + .history-week { margin-top: 28px; }
 #pouch-preview .history-week > h3 { margin: 16px 0 4px; padding-bottom: 8px; border-bottom: 1px solid var(--p-line); font-size: 16px; color: var(--p-muted); }
+
+#pouch-preview .purchase-section { margin-top: 12px; }
+#pouch-preview .spending-totals { border-bottom: 0; padding-bottom: 0; }
+#pouch-preview .spending-totals .value { overflow-wrap: anywhere; }
