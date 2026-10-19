@@ -205,3 +205,8 @@ body { margin: 0; background: var(--p-bg); color: var(--p-fg); }
 /* Center disclosure chevrons on the same 44px action column as + and menu. */
 #pouch-preview .recent > summary > .chevron { margin-inline: 13px; color: var(--p-accent); }
 #pouch-preview .history-entry > summary > .chevron { justify-self: center; color: var(--p-accent); }
+
+/* Match overview title rows and section rhythm across tracking screens. */
+#pouch-preview .page-heading { display: flex; align-items: center; min-height: 44px; margin: 0; }
+#pouch-preview .settings-section { display: flow-root; padding-bottom: 12px; }
+#pouch-preview .settings-section + .settings-section { border-top: 1px solid var(--p-line); margin-top: 12px; }

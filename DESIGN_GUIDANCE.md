@@ -107,3 +107,7 @@ Recent entries shares the h2 typography/color rule with Add pouch and Add purcha
 ## Settings actions, 2026-10-19
 
 Export backup and Restore backup reuse History’s borderless accent-text actions, including the flush-left first action. Update app uses the same filled primary style as Add pouch and Save. Backup copy and actions reuse History’s note/action spacing (8px after the copy), without the form-actions top margin. Update app retains the shared 20px form-action margin. Both action rows have a 12px button gap. The Add pouch submit label is Save, matching Log purchase.
+
+## Tracking page hierarchy, 2026-10-19
+
+History, Trends and Settings retain the shared 21px h2 type and now use Today’s 44px centered heading-row height with no extra bottom margin. Settings subsection headings use the same 18px h3 treatment as Summary and Spending. Your data and App updates begin after a divider, 12px section separation and the shared h3 spacing; keep backup actions grouped with their copy.
