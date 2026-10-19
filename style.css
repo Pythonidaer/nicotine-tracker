@@ -198,3 +198,7 @@ body { margin: 0; background: var(--p-bg); color: var(--p-fg); }
   text-align: left;
 }
 #pouch-preview input[type="date"]::-webkit-date-and-time-value { min-width: 0; text-align: left; }
+
+@media (max-width: 639px) {
+  #pouch-preview .pouch-form .pouch-product-fields { grid-template-columns: 1fr; gap: 0; }
+}

@@ -91,3 +91,7 @@ Native date inputs explicitly use border-box sizing, zero intrinsic minimum widt
 ## Dedicated Add pouch screen, 2026-10-19
 
 Opening Add pouch replaces the Today overview with the entry form, following the Log purchase screen pattern. The shared app header and menu remain; Summary, Spending and Recent entries are absent until Save or Cancel returns to Today. Keep default-prefilled shared pickers, optional activity, no automatic picker opening, cancellation without saving, and the brief confirmation/Undo after successful saving.
+
+## Full-width mobile pouch fields, 2026-10-19
+
+Below 640px, the dedicated Add pouch form stacks Brand and Nicotine per pouch at full width, matching its Activity field and the Log purchase inputs. Desktop keeps the existing two-column brand/strength layout. History editing layout remains unchanged.
