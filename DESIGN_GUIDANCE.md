@@ -111,3 +111,7 @@ Export backup and Restore backup reuse History’s borderless accent-text action
 ## Tracking page hierarchy, 2026-10-19
 
 History, Trends and Settings retain the shared 21px h2 type and now use Today’s 44px centered heading-row height with no extra bottom margin. Settings subsection headings use the same 18px h3 treatment as Summary and Spending. Your data and App updates begin after a divider, 12px section separation and the shared h3 spacing; keep backup actions grouped with their copy.
+
+## Browsable seven-day trends, 2026-10-19
+
+Previous/next SVG controls move the chart and paired pouch/nicotine daily averages through consecutive seven-day windows ending today. Date ranges identify the selected window; navigation stops at the earliest pouch and today. Incomplete windows average only days with logs and state the denominator, avoiding assumed zero-use days. Chart heights scale to the selected maximum rather than clipping high counts. Remove the Unlogged day footer; accessible chart descriptions still identify missing logs.
