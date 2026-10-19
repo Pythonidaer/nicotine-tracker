@@ -106,4 +106,4 @@ Recent entries shares the h2 typography/color rule with Add pouch and Add purcha
 
 ## Settings actions, 2026-10-19
 
-Export backup and Restore backup reuse History’s borderless accent-text actions, including the flush-left first action. Update app uses the same filled primary style as Add pouch and Save. Both action rows use the shared 20px top margin and 12px button gap.
+Export backup and Restore backup reuse History’s borderless accent-text actions, including the flush-left first action. Update app uses the same filled primary style as Add pouch and Save. Backup copy and actions reuse History’s note/action spacing (8px after the copy), without the form-actions top margin. Update app retains the shared 20px form-action margin. Both action rows have a 12px button gap. The Add pouch submit label is Save, matching Log purchase.
