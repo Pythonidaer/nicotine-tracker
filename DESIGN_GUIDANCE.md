@@ -99,3 +99,7 @@ Below 640px, the dedicated Add pouch form stacks Brand and Nicotine per pouch at
 ## Shared form action spacing, 2026-10-19
 
 Add pouch uses the same form-actions class as Log purchase and default product settings: 20px above the action row and 12px between buttons. Remove the separate pouch action spacing rule so these forms stay consistent.
+
+## Heading and action-column alignment, 2026-10-19
+
+Recent entries shares the h2 typography/color rule with Add pouch and Add purchase. Its chevron occupies a centered 44px action column; History disclosure rows use the same 44px final grid column and centered accent-colored chevron. Header and main gutters match at both mobile and desktop widths so hamburger, add controls and disclosure chevrons share their horizontal center. Keep actual SVG dimensions and clickable summary behavior unchanged.
