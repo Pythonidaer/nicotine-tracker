@@ -18,13 +18,14 @@ const activityOptions=['Working at kiosk','Concentrating on computer','At comedy
 const addEntryIcon='<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M12 8v8M8 12h8"/></svg>';
 const closeEntryIcon='<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg>';
 const pickerChevron='<svg class="chevron" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>';
-function entryPicker(name,label,options,value){
+function entryPicker(name,label,options,value,suffix=""){
+  const pickerId=name+suffix;
   const selected=options.find(option=>option.value===String(value));
-  return `<label id="${name}-label" for="${name}-trigger">${label}</label>
+  return `<label id="${pickerId}-label" for="${pickerId}-trigger">${label}</label>
     <div class="entry-picker" data-picker="${name}">
-      <select id="entry-${name}" name="${name}" hidden aria-hidden="true" tabindex="-1">${options.map(option=>`<option value="${esc(option.value)}" ${option.value===String(value)?'selected':''}>${esc(option.label)}</option>`).join('')}</select>
-      <button type="button" class="picker-trigger" id="${name}-trigger" aria-haspopup="listbox" aria-expanded="false" aria-controls="${name}-options" aria-labelledby="${name}-label ${name}-value"><span class="picker-value" id="${name}-value">${esc(selected.label)}</span>${pickerChevron}</button>
-      <div class="picker-options" id="${name}-options" role="listbox" aria-labelledby="${name}-label" hidden>${options.map(option=>`<button type="button" role="option" tabindex="-1" aria-selected="${option.value===String(value)}" data-picker-value="${esc(option.value)}">${esc(option.label)}</button>`).join('')}</div>
+      <select id="entry-${pickerId}" name="${name}" hidden aria-hidden="true" tabindex="-1">${options.map(option=>`<option value="${esc(option.value)}" ${option.value===String(value)?'selected':''}>${esc(option.label)}</option>`).join('')}</select>
+      <button type="button" class="picker-trigger" id="${pickerId}-trigger" aria-haspopup="listbox" aria-expanded="false" aria-controls="${pickerId}-options" aria-labelledby="${pickerId}-label ${pickerId}-value"><span class="picker-value" id="${pickerId}-value">${esc(selected.label)}</span>${pickerChevron}</button>
+      <div class="picker-options" id="${pickerId}-options" role="listbox" aria-labelledby="${pickerId}-label" hidden>${options.map(option=>`<button type="button" role="option" tabindex="-1" aria-selected="${option.value===String(value)}" data-picker-value="${esc(option.value)}">${esc(option.label)}</button>`).join('')}</div>
     </div>`;
 }
 function pouchEntryMarkup(){
@@ -146,47 +147,60 @@ function rows(list){
   return list.map(entry=>{
     const title=entry.type==='pouch'?`${esc(entry.brand)} · ${entry.mg} mg`:entry.type==='craving'?`Craving · ${entry.intensity}/5`:`${esc(entry.brand)} · ${entry.tins} tin${entry.tins>1?'s':''}`;
     return `<details class="entry history-entry" data-entry-id="${entry.id}" name="entry-options">
-      <summary><span class="entry-description">${title}<small>${esc(entry.time)}${entry.activity?' · '+esc(entry.activity):''}${entry.replacement?' · '+esc(entry.replacement):''}${entry.note?' · Note added':''}</small></span><span class="entry-cost">${entry.type==='purchase'?money(entry.amount):''}</span>${entryChevron}</summary>
+      <summary><span class="entry-description">${title}<small>${esc(entry.time)}${entry.activity?' · '+esc(entry.activity):''}${entry.replacement?' · '+esc(entry.replacement):''}</small></span><span class="entry-cost">${entry.type==='purchase'?money(entry.amount):''}</span>${entryChevron}</summary>
       <div class="entry-details">
         ${entry.note?`<p class="entry-note">${esc(entry.note)}</p>`:''}
-        <div class="entry-actions"><button type="button" class="link" data-note="${entry.id}">${entry.note?'Edit note':'Add note'}</button><button type="button" class="link" data-delete="${entry.id}" aria-label="Delete entry">Delete</button></div>
-        <form class="note-form" data-kind="note" data-id="${entry.id}" hidden>
-          <label for="note-${entry.id}">Note</label><textarea id="note-${entry.id}" name="note" rows="2" maxlength="1000">${esc(entry.note||'')}</textarea>
-          <div class="note-buttons"><button type="submit" class="primary">Save note</button><button type="button" data-note-cancel="${entry.id}">Cancel</button></div>
-        </form>
+        <div class="entry-actions"><button type="button" class="link" data-edit="${entry.id}">Edit entry</button><button type="button" class="link" data-delete="${entry.id}" aria-label="Delete entry">Delete</button></div>
+        <div class="entry-editor" hidden></div>
         <p class="note-status" role="status" aria-live="polite"></p>
       </div>
     </details>`;
   }).join('')||'<div class="empty">No entries yet.</div>';
 }
-function editEntryNote(button,editing){
-  const row=button.closest('.history-entry');
-  const editor=row.querySelector('.note-form');
-  editor.hidden=!editing;
-  row.querySelector('.entry-actions').hidden=editing;
-  const preview=row.querySelector('.entry-note');
-  if(preview)preview.hidden=editing;
-  if(editing){editor.elements.note.focus();return;}
-  editor.elements.note.value=findEntry(Number(row.dataset.entryId))?.note||'';
-  row.querySelector('[data-note]').focus();
+function editRecord(button,editing){
+  const row=button.closest('.history-entry'),editor=row.querySelector('.entry-editor');
+  editor.hidden=!editing;row.querySelector('.entry-actions').hidden=editing;
+  const preview=row.querySelector('.entry-note');if(preview)preview.hidden=editing;
+  if(!editing){editor.innerHTML='';row.querySelector('[data-edit]').focus({preventScroll:true});return;}
+  const entry=findEntry(Number(row.dataset.entryId));if(!entry)return;
+  const suffix=`-${entry.id}`,brands=['On!','Velo','Zyn'].map(value=>({value,label:value}));
+  let fields=entryPicker('brand','Brand',brands,entry.brand,suffix);
+  if(entry.type==='pouch'){
+    fields=`<div class="pouch-product-fields"><div>${fields}</div><div>${entryPicker('mg','Nicotine per pouch',[3,6,9,11,12,15].map(mg=>({value:String(mg),label:`${mg} mg`})),entry.mg,suffix)}</div></div>`;
+    const activities=['',...activityOptions];
+    // Preserve an existing activity from a backup even if it is not in today's list.
+    if(entry.activity&&!activities.includes(entry.activity))activities.push(entry.activity);
+    fields+=entryPicker('activity','What are you doing? (optional)',activities.map(value=>({value,label:value||'Not specified'})),entry.activity||'',suffix);
+  }else if(entry.type==='purchase'){
+    fields+=`<div class="pouch-product-fields"><div><label for="tins${suffix}">Number of tins</label><input id="tins${suffix}" name="tins" type="number" min="1" step="1" required value="${entry.tins}"></div><div><label for="amount${suffix}">Total paid ($)</label><input id="amount${suffix}" name="amount" type="number" min="0" step="0.01" required value="${entry.amount}"></div></div><label for="date${suffix}">Purchase date</label><input id="date${suffix}" name="date" type="date" required value="${esc(entry.date)}">`;
+  }
+  editor.innerHTML=`<form class="record-form" data-kind="record" data-id="${entry.id}">${fields}<label for="note${suffix}">Note (optional)</label><textarea id="note${suffix}" name="note" rows="5" maxlength="1000">${esc(entry.note||'')}</textarea><div class="note-buttons"><button type="submit" class="primary">Save changes</button><button type="button" data-edit-cancel="${entry.id}">Cancel</button></div></form>`;
+  const form=editor.querySelector('form');form.setAttribute('tabindex','-1');form.focus({preventScroll:true});
+  const note=form.elements.note;note.style.height=`${Math.min(320,Math.max(144,note.scrollHeight))}px`;note.scrollTop=0;
 }
-function saveEntryNote(form){
-  const id=Number(form.dataset.id),entry=findEntry(id);
-  if(!entry)return;
-  const note=form.elements.note.value.trim();
+function saveRecord(form){
+  const id=Number(form.dataset.id),entry=findEntry(id);if(!entry)return;
+  const data=new FormData(form),brand=data.get('brand'),note=data.get('note').trim();
+  if(!['On!','Velo','Zyn'].includes(brand))return;
   if(note.length>1000){form.elements.note.setCustomValidity('Keep your note to 1,000 characters or fewer.');form.elements.note.reportValidity();return;}
   form.elements.note.setCustomValidity('');
-  const previous=entry.note;
-  if(note)entry.note=note;else delete entry.note;
-  if(!persist()){if(previous===undefined)delete entry.note;else entry.note=previous;return;}
+  const updated={...entry,brand};
+  if(entry.type==='pouch'){
+    const mg=Number(data.get('mg')),activity=data.get('activity');
+    if(![3,6,9,11,12,15].includes(mg)||typeof activity!=='string'||activity.length>120||(!activityOptions.includes(activity)&&activity!==''&&activity!==entry.activity))return;
+    updated.mg=mg;if(activity)updated.activity=activity;else delete updated.activity;
+  }else if(entry.type==='purchase'){
+    const tins=Number(data.get('tins')),amount=Number(data.get('amount')),date=data.get('date');
+    if(!Number.isInteger(tins)||tins<1||!Number.isFinite(amount)||amount<0||!/^\d{4}-\d{2}-\d{2}$/.test(date))return;
+    updated.tins=tins;updated.amount=amount;updated.date=date;if(date!==entry.date)updated.time=date;
+  }
+  if(note)updated.note=note;else delete updated.note;
+  const collection=entry.type==='purchase'?purchases:entries,index=collection.indexOf(entry);
+  collection[index]=updated;
+  if(!persist()){collection[index]=entry;return;}
   render();
   const row=content.querySelector(`[data-entry-id="${id}"]`);
-  if(row){
-    const recent=row.closest('.recent');if(recent)recent.open=true;
-    row.open=true;
-    row.querySelector('.note-status').textContent=note?'Note saved.':'Note cleared.';
-    row.querySelector('[data-note]').focus({preventScroll:true});
-  }
+  if(row){const recent=row.closest('.recent');if(recent)recent.open=true;row.open=true;row.querySelector('.note-status').textContent='Entry updated.';row.querySelector('[data-edit]').focus({preventScroll:true});}
 }
 function scrollToResourceSection(link){
   const id=link.getAttribute('href').slice(1),section=document.getElementById(id);
@@ -245,9 +259,9 @@ try{
   location.reload();
 }catch(error){status.textContent=error.message||'Could not update. Check your connection and try again.';button.disabled=false;}
 }
-root.addEventListener('click',e=>{const articleLink=e.target.closest('.resource-contents a[href^="#"]');if(articleLink){e.preventDefault();scrollToResourceSection(articleLink);return;}const b=e.target.closest('button, .brand');if(!b)return;if(b.dataset.note){editEntryNote(b,true);return;}if(b.dataset.noteCancel){editEntryNote(b,false);return;}if(b.dataset.view){e.preventDefault();setMenuOpen(false);view=b.dataset.view;notice='';pouchFormOpen=false;clearTimeout(feedbackTimer);render();content.focus({preventScroll:true});window.scrollTo({top:0,behavior:'instant'});return}if(b.dataset.delete){const id=Number(b.dataset.delete);entries=entries.filter(x=>x.id!==id);purchases=purchases.filter(x=>x.id!==id);persist();notice='';render();return}const a=b.dataset.action;if(a==='update'){updateApp(b);return}if(a==='open-pouch'){if(pouchFormOpen){closePouchEntry();return;}pouchFormOpen=true;notice='';clearTimeout(feedbackTimer);render();content.querySelector('[data-action="open-pouch"]').focus({preventScroll:true});}else if(a==='cancel-pouch'){closePouchEntry();}else if(a==='undo'){const previous=entries;entries=entries.filter(e=>e.id!==lastAdded);if(!persist()){entries=previous;return;}closePouchEntry();}else if(a==='export'){const blob=new Blob([JSON.stringify({version:1,product,entries,purchases},null,2)],{type:'application/json'});const url=URL.createObjectURL(blob),link=document.createElement('a');link.href=url;link.download='pouch-tracker-backup.json';link.click();setTimeout(()=>URL.revokeObjectURL(url),1000)}else if(a==='restore'){root.querySelector('#backup-file').click()}else if(a==='cancel')render();else if(a)form(a)});
-root.addEventListener('input',e=>{if(e.target.matches('.note-form textarea'))e.target.setCustomValidity('')});
-root.addEventListener('submit',e=>{e.preventDefault();const f=e.target,d=new FormData(f),kind=f.dataset.kind;if(kind==='pouch'){addPouchFromForm(f);return;}if(kind==='note'){saveEntryNote(f);return;}if(kind==='product')product={brand:d.get('brand'),mg:Number(d.get('mg'))};else if(kind==='craving')entries.unshift({id:Date.now(),type:kind,intensity:Number(d.get('intensity')),replacement:d.get('replacement'),time:time()});else purchases.unshift({id:Date.now(),type:kind,brand:d.get('brand'),tins:Number(d.get('tins')),amount:Number(d.get('amount')),date:d.get('date'),time:d.get('date')});persist();render()});
+root.addEventListener('click',e=>{const articleLink=e.target.closest('.resource-contents a[href^="#"]');if(articleLink){e.preventDefault();scrollToResourceSection(articleLink);return;}const b=e.target.closest('button, .brand');if(!b)return;if(b.dataset.edit){editRecord(b,true);return;}if(b.dataset.editCancel){editRecord(b,false);return;}if(b.dataset.view){e.preventDefault();setMenuOpen(false);view=b.dataset.view;notice='';pouchFormOpen=false;clearTimeout(feedbackTimer);render();content.focus({preventScroll:true});window.scrollTo({top:0,behavior:'instant'});return}if(b.dataset.delete){const id=Number(b.dataset.delete);entries=entries.filter(x=>x.id!==id);purchases=purchases.filter(x=>x.id!==id);persist();notice='';render();return}const a=b.dataset.action;if(a==='update'){updateApp(b);return}if(a==='open-pouch'){if(pouchFormOpen){closePouchEntry();return;}pouchFormOpen=true;notice='';clearTimeout(feedbackTimer);render();content.querySelector('[data-action="open-pouch"]').focus({preventScroll:true});}else if(a==='cancel-pouch'){closePouchEntry();}else if(a==='undo'){const previous=entries;entries=entries.filter(e=>e.id!==lastAdded);if(!persist()){entries=previous;return;}closePouchEntry();}else if(a==='export'){const blob=new Blob([JSON.stringify({version:1,product,entries,purchases},null,2)],{type:'application/json'});const url=URL.createObjectURL(blob),link=document.createElement('a');link.href=url;link.download='pouch-tracker-backup.json';link.click();setTimeout(()=>URL.revokeObjectURL(url),1000)}else if(a==='restore'){root.querySelector('#backup-file').click()}else if(a==='cancel')render();else if(a)form(a)});
+root.addEventListener('input',e=>{if(e.target.matches('.record-form textarea'))e.target.setCustomValidity('')});
+root.addEventListener('submit',e=>{e.preventDefault();const f=e.target,d=new FormData(f),kind=f.dataset.kind;if(kind==='pouch'){addPouchFromForm(f);return;}if(kind==='record'){saveRecord(f);return;}if(kind==='product')product={brand:d.get('brand'),mg:Number(d.get('mg'))};else if(kind==='craving')entries.unshift({id:Date.now(),type:kind,intensity:Number(d.get('intensity')),replacement:d.get('replacement'),time:time()});else purchases.unshift({id:Date.now(),type:kind,brand:d.get('brand'),tins:Number(d.get('tins')),amount:Number(d.get('amount')),date:d.get('date'),time:d.get('date')});persist();render()});
 root.addEventListener('change',async e=>{if(e.target.id!=='backup-file'||!e.target.files[0])return;try{const d=JSON.parse(await e.target.files[0].text());const strengths=[3,6,9,11,12,15],brands=['On!','Velo','Zyn'];if(d.version!==1||!brands.includes(d.product?.brand)||!strengths.includes(d.product?.mg)||!Array.isArray(d.entries)||!Array.isArray(d.purchases))throw Error();if(!d.entries.every(x=>validOptionalNote(x)&&validOptionalActivity(x)&&x.type==='pouch'&&brands.includes(x.brand)&&strengths.includes(x.mg)&&Number.isFinite(x.id)&&/^\d{4}-\d{2}-\d{2}$/.test(x.date)&&typeof x.time==='string')||!d.purchases.every(x=>validOptionalNote(x)&&validOptionalActivity(x)&&x.type==='purchase'&&brands.includes(x.brand)&&Number.isFinite(x.id)&&Number.isInteger(x.tins)&&x.tins>0&&Number.isFinite(x.amount)&&x.amount>=0&&/^\d{4}-\d{2}-\d{2}$/.test(x.date)&&typeof x.time==='string'))throw Error();if(!confirm('Replace device logs with this backup?'))return;product=d.product;entries=d.entries;purchases=d.purchases;persist();render();alert('Backup restored.')}catch{alert('This is not a valid Pouch Tracker backup.')}});
 render();
 if('serviceWorker' in navigator)navigator.serviceWorker.register('./sw.js');

@@ -59,3 +59,7 @@ The activity field uses a custom button/listbox to avoid the oversized iOS nativ
 ## Shared entry selectors, 2026-10-19
 
 Brand, nicotine strength and activity now share one field-width, scrollable picker component. Brand and strength retain their two-column layout. Opening Add pouch keeps focus on the disclosure control and opens no picker. Tapping any trigger or its SVG arrow toggles its popup; pointer-down state prevents mobile focus changes from closing and immediately reopening it. Only one picker opens at a time. Outside taps, selection, Escape and Tab close it. Hidden selects keep form submission and the existing saved values unchanged.
+
+## Editing saved entries, 2026-10-19
+
+History/Recent entries omit the Note added suffix. Edit entry replaces the note-only action and opens an inline editor on demand. Pouches expose brand, strength, optional activity and note; purchases expose brand, tins, amount, purchase date and note. Shared pickers use unique IDs per record. Legacy entries without an activity start at Not specified; an existing imported activity remains available. Notes start at five rows and expand to fit up to 320px, with internal scrolling and manual resizing for longer notes. Cancel discards the draft; save preserves IDs, pouch timestamps, defaults and unrelated fields, recalculates totals, and persists before showing confirmation. Storage failure restores the original record and leaves the draft available. The storage/backup schema remains version 1.

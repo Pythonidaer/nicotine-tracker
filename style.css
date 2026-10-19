@@ -151,8 +151,8 @@ body { margin: 0; background: var(--p-bg); color: var(--p-fg); }
 #pouch-preview .entry-actions, #pouch-preview .note-buttons { display: flex; gap: 12px; flex-wrap: wrap; }
 #pouch-preview .entry-actions button:first-child { padding-left: 0; }
 #pouch-preview .entry-note { white-space: pre-wrap; overflow-wrap: anywhere; margin: 4px 0 8px; }
-#pouch-preview .note-form label { margin-top: 4px; }
-#pouch-preview textarea { display: block; min-height: 72px; max-height: 160px; resize: vertical; }
+#pouch-preview .record-form { padding-bottom: 4px; }
+#pouch-preview textarea { display: block; min-height: 144px; max-height: 320px; resize: vertical; }
 #pouch-preview .note-buttons { margin-top: 8px; }
 #pouch-preview .note-status { color: var(--p-accent); margin: 4px 0 0; font-size: 12px; }
 #pouch-preview .note-status:empty { display: none; }
