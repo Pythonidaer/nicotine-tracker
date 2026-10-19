@@ -176,3 +176,6 @@ body { margin: 0; background: var(--p-bg); color: var(--p-fg); }
 #pouch-preview .picker-options button { display: block; width: 100%; min-height: 44px; padding: 8px; border: 0; border-radius: 3px; font-family: inherit; font-size: 14px; text-align: left; overflow-wrap: anywhere; }
 #pouch-preview .picker-options button[aria-selected="true"] { background: var(--p-accent); color: var(--p-on); }
 #pouch-preview .picker-options button:focus-visible { outline-offset: -2px; }
+
+#pouch-preview .history-week + .history-week { margin-top: 28px; }
+#pouch-preview .history-week > h3 { margin: 16px 0 4px; padding-bottom: 8px; border-bottom: 1px solid var(--p-line); font-size: 16px; color: var(--p-muted); }

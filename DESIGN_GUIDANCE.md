@@ -63,3 +63,7 @@ Brand, nicotine strength and activity now share one field-width, scrollable pick
 ## Editing saved entries, 2026-10-19
 
 History/Recent entries omit the Note added suffix. Edit entry replaces the note-only action and opens an inline editor on demand. Pouches expose brand, strength, optional activity and note; purchases expose brand, tins, amount, purchase date and note. Shared pickers use unique IDs per record. Legacy entries without an activity start at Not specified; an existing imported activity remains available. Notes start at five rows and expand to fit up to 320px, with internal scrolling and manual resizing for longer notes. Cancel discards the draft; save preserves IDs, pouch timestamps, defaults and unrelated fields, recalculates totals, and persists before showing confirmation. Storage failure restores the original record and leaves the draft available. The storage/backup schema remains version 1.
+
+## Weekly history, 2026-10-19
+
+History groups saved records by Monday–Sunday calendar weeks, newest first, using each record's saved local date. Each nonempty week has a date-range heading and 28px separation from the next group. History rows include weekday/date before time to distinguish days within a week; Recent entries retain time-only labels. Pouches and purchases remain together. Grouping never combines or removes records, including identical-looking logs. Editing a purchase date moves that record to its matching week.

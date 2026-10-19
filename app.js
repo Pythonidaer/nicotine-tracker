@@ -143,11 +143,34 @@ const entryChevron='<svg class="chevron" viewBox="0 0 24 24" width="18" height="
 const findEntry=id=>[...entries,...purchases].find(entry=>entry.id===id);
 const validOptionalActivity=entry=>entry.activity===undefined||(typeof entry.activity==='string'&&entry.activity.length<=120);
 const validOptionalNote=entry=>entry.note===undefined||(typeof entry.note==='string'&&entry.note.length<=1000);
-function rows(list){
+function historyDate(date){
+  return new Date(`${date}T12:00:00`).toLocaleDateString([], {weekday:'short',month:'short',day:'numeric'});
+}
+function weeklyHistory(){
+  const records=items().sort((a,b)=>b.date.localeCompare(a.date)||b.id-a.id);
+  if(!records.length)return rows([]);
+  const weeks=new Map();
+  for(const entry of records){
+    // Use the saved local date, so timezone changes do not move old records.
+    const monday=new Date(`${entry.date}T12:00:00`);
+    monday.setDate(monday.getDate()-((monday.getDay()+6)%7));
+    const key=localDate(monday);
+    if(!weeks.has(key))weeks.set(key,[]);
+    weeks.get(key).push(entry);
+  }
+  return [...weeks].map(([key,weekEntries])=>{
+    const start=new Date(`${key}T12:00:00`),end=new Date(start);end.setDate(end.getDate()+6);
+    const sameYear=start.getFullYear()===end.getFullYear();
+    const startLabel=start.toLocaleDateString([], {month:'short',day:'numeric',...(sameYear?{}:{year:'numeric'})});
+    const endLabel=end.toLocaleDateString([], {month:'short',day:'numeric',year:'numeric'});
+    return `<section class="history-week" aria-labelledby="week-${key}"><h3 id="week-${key}">${esc(startLabel)} – ${esc(endLabel)}</h3>${rows(weekEntries,true)}</section>`;
+  }).join('');
+}
+function rows(list,showDate=false){
   return list.map(entry=>{
     const title=entry.type==='pouch'?`${esc(entry.brand)} · ${entry.mg} mg`:entry.type==='craving'?`Craving · ${entry.intensity}/5`:`${esc(entry.brand)} · ${entry.tins} tin${entry.tins>1?'s':''}`;
     return `<details class="entry history-entry" data-entry-id="${entry.id}" name="entry-options">
-      <summary><span class="entry-description">${title}<small>${esc(entry.time)}${entry.activity?' · '+esc(entry.activity):''}${entry.replacement?' · '+esc(entry.replacement):''}</small></span><span class="entry-cost">${entry.type==='purchase'?money(entry.amount):''}</span>${entryChevron}</summary>
+      <summary><span class="entry-description">${title}<small>${showDate?esc(historyDate(entry.date))+' · ':''}${esc(entry.time)}${entry.activity?' · '+esc(entry.activity):''}${entry.replacement?' · '+esc(entry.replacement):''}</small></span><span class="entry-cost">${entry.type==='purchase'?money(entry.amount):''}</span>${entryChevron}</summary>
       <div class="entry-details">
         ${entry.note?`<p class="entry-note">${esc(entry.note)}</p>`:''}
         <div class="entry-actions"><button type="button" class="link" data-edit="${entry.id}">Edit entry</button><button type="button" class="link" data-delete="${entry.id}" aria-label="Delete entry">Delete</button></div>
@@ -215,7 +238,7 @@ function render(){
 root.querySelectorAll('nav button').forEach(b=>b.dataset.view===view?b.setAttribute('aria-current','page'):b.removeAttribute('aria-current'));
 const today=localDate(new Date()),week=new Date();week.setHours(0,0,0,0);week.setDate(week.getDate()-((week.getDay()+6)%7));const weekKey=localDate(week),month=today.slice(0,7);let total=entries.filter(e=>e.type==='pouch'&&e.date===today),spent=purchases.filter(p=>p.date>=weekKey&&p.date<=today).reduce((s,p)=>s+p.amount,0),monthSpent=purchases.filter(p=>p.date.startsWith(month)&&p.date<=today).reduce((s,p)=>s+p.amount,0);
 if(view==='today')content.innerHTML=`${pouchEntryMarkup()}<h3>Summary</h3><div class="totals"><div><div class="value">${total.length}</div><div class="caption">Pouches</div></div><div><div class="value">${total.reduce((s,e)=>s+e.mg,0)} <small>mg</small></div><div class="caption">Nicotine</div></div></div><h3>Spending</h3><div class="row"><span class="caption">This week</span><span>${money(spent)}</span></div><div class="row"><span class="caption">This month</span><span>${money(monthSpent)}</span></div><div class="actions" style="margin-top:10px"><button class="link" data-action="purchase">Log purchase</button></div><details class="recent"><summary>Recent entries <svg class="chevron" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></summary>${rows(entries.filter(e=>e.date===today).slice(0,3))}</details>`;
-if(view==='history')content.innerHTML=`<h2>History</h2>${rows(items())}`;
+if(view==='history')content.innerHTML=`<h2>History</h2>${weeklyHistory()}`;
 if(view==='trends'){const dates=Array.from({length:7},(_,i)=>{const d=new Date();d.setDate(d.getDate()-6+i);return d});const vals=dates.map(d=>{const found=entries.filter(e=>e.date===localDate(d));return found.length?found.length:null}),days=dates.map((d,i)=>i===6?'Today':d.toLocaleDateString([], {weekday:'short'}));content.innerHTML=`<h2>Trends</h2><div class="caption">Pouches logged · last 7 days</div><div class="bars" role="img" aria-label="Daily pouch counts: ${vals.map((v,i)=>days[i]+': '+(v===null?'unlogged':v)).join(', ')}">${vals.map((n,i)=>`<div class="column"><span>${n===null?'—':n}</span><div class="bar" style="height:${n===null?0:Math.min(n*8,100)}px"></div><small>${days[i]}</small></div>`).join('')}</div><div class="entry"><span>Seven-day average</span><span>${vals.filter(v=>v!==null).length===7?(vals.reduce((a,b)=>a+b,0)/7).toFixed(1)+' pouches':'Not enough data'}</span></div><div class="entry"><span>Purchases this month</span><span>${money(monthSpent)}</span></div><div class="caption">— Unlogged day</div>`}
 if(view==='resources')content.innerHTML=window.pouchResources;
 if(view==='settings')content.innerHTML=`<h2>Settings</h2><h3>Default product</h3><div class="row"><span>${esc(product.brand)} · ${product.mg} mg</span><button class="link" data-action="product">Change</button></div><h3>Your data</h3><div class="caption">Logs are saved on this device. Export a backup before clearing browser data or switching phones.</div><div class="form-actions"><button data-action="export">Export backup</button><button data-action="restore">Restore backup</button></div><input type="file" id="backup-file" accept="application/json,.json" hidden><h3>App updates</h3><div class="caption">Check for the latest app files and reload. Your saved logs and settings stay on this device.</div><button data-action="update">Update app</button><p id="update-status" role="status" aria-live="polite"></p><h3>About totals</h3><div class="caption">Labeled nicotine is the content listed on the pouch, not the amount absorbed. Weeks start Monday. Unlogged days are unknown.</div>`;
