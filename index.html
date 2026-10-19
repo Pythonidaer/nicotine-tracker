@@ -1,8 +1,42 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#365947"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Pouch Tracker"><title>Pouch Tracker</title><link rel="manifest" href="./manifest.webmanifest"><link rel="apple-touch-icon" href="./icons/icon-192.png"><link rel="stylesheet" href="./style.css?v=3"></head><body>
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#365947">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Pouch Tracker">
+  <title>Pouch Tracker</title>
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="apple-touch-icon" href="./icons/icon-192.png">
+  <link rel="stylesheet" href="./style.css?v=4">
+</head>
+<body>
 <div id="pouch-preview">
   <a class="skip-link" href="#pouch-content">Skip to content</a>
-  <header><span>Pouch Tracker</span></header>
+  <header class="app-header">
+    <a class="brand" href="#" data-view="today" aria-label="Pouch Tracker home">
+      <img src="./icons/icon-192.png" width="28" height="28" alt="">
+      <span>Pouch Tracker</span>
+    </a>
+    <button class="menu-toggle" type="button" aria-label="Open navigation" aria-controls="app-navigation" aria-expanded="false">
+      <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+        <path class="menu-top" d="M4 6h16"/>
+        <path class="menu-middle" d="M4 12h16"/>
+        <path class="menu-bottom" d="M4 18h16"/>
+      </svg>
+    </button>
+    <nav id="app-navigation" aria-label="App navigation" hidden>
+      <button type="button" data-view="today" aria-current="page">Today</button>
+      <button type="button" data-view="history">History</button>
+      <button type="button" data-view="trends">Trends</button>
+      <button type="button" data-view="resources">Quitting nicotine</button>
+      <button type="button" data-view="settings">Settings</button>
+    </nav>
+  </header>
   <main id="pouch-content" tabindex="-1"></main>
-  <nav aria-label="App navigation"><button data-view="today">Today</button><button data-view="history">History</button><button data-view="trends">Trends</button><button data-view="settings">Settings</button></nav>
 </div>
-<script src="./app.js?v=3"></script></body></html>
+<script src="./resources.js?v=4"></script>
+<script src="./app.js?v=4"></script>
+</body>
+</html>

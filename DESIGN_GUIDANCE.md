@@ -1,37 +1,33 @@
 # Design guidance and decisions
 
-Applied 2026-10-18 from [LLM Instruction Toolkit](https://github.com/Pythonidaer/llm-instruction-toolkit/tree/8fcbf905152c911f2350b9bb6105a1ca3a3de5ab/design).
+Updated 2026-10-19. Shared source: [LLM Instruction Toolkit](https://github.com/Pythonidaer/llm-instruction-toolkit/tree/9e136f976f8b63e9063ac518ec36fdcb0804227a/design).
 
-## Scope
+Read the three AI design reset files, content-and-tone/best-practices.md, project-questions.md, and the navigation pattern when changing this interface. Apply relevant clean-code guidance to bounded changes. Explicit user choices take precedence over toolkit defaults.
 
-Apply the shared visual, content, and information-architecture reset. Preserve this app's focused logging flow, compact typography, offline-first operation, existing green accent, light/dark themes, storage format, and backups. The palette is an existing product choice, not a new universal theme.
+## Current project choices
 
 | Decision | Reason | Alternative | Check |
 | --- | --- | --- | --- |
-| Sticky frosted header with opaque fallback | Keep app identity visible without decorative glass panels | Fully opaque header | Check scrolling, light/dark mode, safe areas, and unsupported blur |
-| Keep four bottom tabs instead of adding the default hamburger | Today, History, Trends, and Settings are frequent app destinations; direct access supports quick logging | Toolkit dropdown for a site with more destinations | Review narrow widths, keyboard access, enlarged text, and active state |
-| Real SVG recent-entry chevron; plain Log actions | Avoid character-icon substitutes and unnecessary symbols | Clear text only | Check disclosure and labels |
-| Labeled nicotine and last-7-days labels | Describe actual figures and remove obsolete preview wording | More explanation in Settings | Check labels against real calculations |
-| Consolidated CSS; 44px controls and 16px inputs | Avoid stacked overrides, invisible expanded hit regions, and small mobile input text | Project-specific density changes after device review | Check focus clearance, touch targets, wrapping, and iPhone focus zoom |
-| Preserve compact content; no reveal animation or roadmap | Logging does not need a staged entrance or learning diagram | Add a purposeful pattern after review | Primary actions remain immediately available |
+| Opaque, non-sticky logo header with hamburger disclosure at every width | User requested removing sticky frost and moving the bottom destinations into a dropdown | Toolkit sticky frosted header with desktop links | No blur or sticky header; all five destinations accessible at 320px and desktop |
+| Existing pouch icon and Pouch Tracker wordmark link to Today | Reuse approved identity and provide a home action | New branding | Keyboard name, link behavior and image fallback |
+| Nonmodal dropdown; no backdrop, focus trap, scroll lock or visible Menu/Close text | Navigation is a short destination list | Modal drawer | Escape/focus return, outside click, focus leaving header, destination selection, hidden focusability |
+| Oswald headings/controls and Merriweather reading text | Verified font pair on Atomic Design chapter 1, Designing Systems | Platform system fonts | Correct fonts online/offline, readable inputs and narrow-screen layout |
+| Compact tracking screens; larger article text and a distinct heading scale for resources | Logging and reading have different density needs | Same type scale everywhere | Tracker stays quick to scan; article headings and paragraphs remain readable |
+| Keep existing green, light/dark surfaces and restrained dividers | Preserve the established app identity | Copy reference orange palette | Contrast, focus visibility and meaningful grouping |
+| No reveal animations; only short disclosure and hamburger transitions | Core logging stays immediately available | Toolkit optional motion patterns | Reduced-motion support |
 
-Screen changes move focus to the content and return to the page top. A skip link provides direct keyboard access to content. Navigation has explicit current-page semantics. Focus outlines retain reserved clearance; the content focus target itself does not draw a decorative frame.
+Typography reference: [Designing Systems](https://atomicdesign.bradfrost.com/chapter-1/) and its /css/style.css. The reference uses Oswald for headings, Merriweather for .text passages, a large normal-weight title, 2em section headings with a rule, and 1.5em subheadings. Adapt those relationships to the app, rather than importing the book's full CSS. Fonts are self-hosted under fonts/ with their SIL Open Font Licenses and cached by the service worker. Use plain 1, 2, 3 sequence numbering and real SVG UI icons; no emojis or text substitutes.
 
-## Source guidance
+## Content and tone brief
 
-- [Visual reset](https://github.com/Pythonidaer/llm-instruction-toolkit/blob/8fcbf905152c911f2350b9bb6105a1ca3a3de5ab/design/ai-design-reset/visual-styling.md)
-- [Content reset](https://github.com/Pythonidaer/llm-instruction-toolkit/blob/8fcbf905152c911f2350b9bb6105a1ca3a3de5ab/design/ai-design-reset/content-design.md)
-- [Layout and information architecture](https://github.com/Pythonidaer/llm-instruction-toolkit/blob/8fcbf905152c911f2350b9bb6105a1ca3a3de5ab/design/ai-design-reset/layout-and-information-architecture.md)
-- [Navigation pattern](https://github.com/Pythonidaer/llm-instruction-toolkit/blob/8fcbf905152c911f2350b9bb6105a1ca3a3de5ab/design/patterns/navigation/frosted-header-dropdown.md)
+Audience: adults already using pouches who want to understand use/spending and explore reduction or quitting. Task: log quickly, find practical next actions, and distinguish supported treatment options from personal experiments.
 
-The toolkit is the shared source; this file records the app's decisions and exceptions. Future toolkit changes require deliberate review rather than automatic UI replacement.
+Voice: conversational, explanatory, concrete and respectful. Informal enough to read naturally; serious about health; restrained encouragement. Use clear questions and familiar examples where useful. The reference's approachable explanation is inspiration, not a request to reproduce Brad Frost's distinctive wording or jokes. No shame, hype, fake success rates, assumed feelings or medical promises. Errors state the problem and recovery action; confirmations state only verified changes. Keep the article's source and limitation context, not repeated generic warnings on every paragraph.
 
-## Verification for this change
+Content owner: repository owner. Source map and maintenance triggers: [RESOURCE_SOURCES.md](RESOURCE_SOURCES.md).
 
-JavaScript syntax and whitespace checks passed. A lightweight simulated-DOM smoke check exercised logging, undo, settings, reload persistence, purchases, trends, history, deletion, and navigation state/focus calls. These checks do not establish rendered geometry or browser focus behavior. Browser installation failed in this environment; mobile Safari appearance, safe areas, blur rendering, keyboard behavior, and offline reopening remain for device review. Backup schema and storage key were preserved; export/restore logic was not changed.
+## Data and updates
 
-## App refresh and skip link correction
+Keep pouch-tracker-v1 localStorage and version 1 backups unchanged. Never clear stored logs during an interface refresh. Settings → Update app remains the supported installed-PWA refresh path. Asset query versions and service-worker caches advance together; app shell, resource copy, fonts and icons are cached locally. No new database, account, analytics, or cloud dependency.
 
-Settings includes Update app: check/install an available service worker, activate it through an explicit message, refresh the current HTML/script/stylesheet URLs, then reload. Failures show a retryable status; this action never clears localStorage or invokes backup restore. Explicit reload requests fail on network errors rather than silently accepting offline cached files. Asset URLs and the app-shell cache are versioned together to prevent the previous stylesheet being mixed with new markup.
-
-The skip link uses clipped offscreen styling and becomes visible only with keyboard focus-visible, preserving keyboard access without a touch-focused label. JavaScript syntax and existing tracking smoke checks pass. Native PWA update lifecycle and iPhone rendering remain for device review.
+Keep the skip link available for keyboard focus, hidden during ordinary touch use. Screen changes move focus to main content and return to the top. Current destination is identified with aria-current and a visible selected state.

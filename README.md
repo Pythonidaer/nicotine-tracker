@@ -49,8 +49,9 @@ Serve this folder with any static HTTP server. Service workers require HTTPS or 
 - [ ] Choose a submission destination and optional reply contact; obtain consent before attaching logs or diagnostics.
 
 ### Reduction, replacements, and cravings
-- [ ] Research evidence-supported techniques for nicotine reduction, replacements, and craving management/treatment using authoritative sources and primary research.
-- [ ] Record source links, evidence quality, studied nicotine product/population, and limitations; distinguish pouch-specific findings from smoking/vaping evidence.
+- [x] Add a source-linked introductory resource covering nicotine reduction, cravings, withdrawal and treatment options, distinguishing evidence for pouches, smoking, and smokeless tobacco.
+- [ ] Continue reviewing new pouch-specific cessation research and expand the resource when supported.
+- [x] Record source links, populations, evidence qualifications, and review triggers in RESOURCE_SOURCES.md.
 - [ ] Add optional craving intensity (1–5) and replacement/delay tracking.
 - [ ] Add later daily/weekly reflections on a separate screen.
 - [ ] Add personal experiment comparisons without implying that observed associations prove causation.
@@ -59,9 +60,13 @@ Serve this folder with any static HTTP server. Service workers require HTTPS or 
 - [ ] Support alternative forms of nicotine with product-appropriate units and measurements.
 - [ ] Evaluate optional Google login and cloud sync after the local-first trial.
 
+## Quitting nicotine resources
+
+Open Quitting nicotine in the header menu for practical guidance on patterns, changes, cravings, withdrawal, and professional support. Original summaries link to CDC, Smokefree, Health Canada, FDA, and Cochrane; evidence limitations are explicit. The guide works offline after updating; external articles need a connection. See [RESOURCE_SOURCES.md](RESOURCE_SOURCES.md) for provenance and review triggers.
+
 ## Design instructions
 
-Read [AGENTS.md](AGENTS.md) and [DESIGN_GUIDANCE.md](DESIGN_GUIDANCE.md). This app applies the shared toolkit design reset with a sticky frosted header. Four bottom tabs remain an intentional app-specific exception to the toolkit dropdown default. Motion reveals and the roadmap are optional patterns and are not enabled here.
+Read [AGENTS.md](AGENTS.md) and [DESIGN_GUIDANCE.md](DESIGN_GUIDANCE.md). This app applies the shared toolkit design and content guidance with an opaque, non-sticky logo header and hamburger dropdown at every screen size. Today, History, Trends, Quitting nicotine, and Settings share that navigation. Typography uses self-hosted Oswald headings/controls and Merriweather reading text, following the Designing Systems reference. Motion reveals and the roadmap are optional patterns and are not enabled here.
 
 ## Refresh the installed app
 
