@@ -71,3 +71,7 @@ History groups saved records by Monday–Sunday calendar weeks, newest first, us
 ## Purchase section, 2026-10-19
 
 Today mirrors the Add pouch heading/icon treatment with Add purchase and the same right-aligned SVG add control. The existing purchase form opens from this icon. Spending uses the Summary two-column totals treatment: actual purchase amounts above Week and Month captions. No estimated consumption costs or changes to week/month calculations.
+
+## Default product selectors, 2026-10-19
+
+Settings → Default product → Change uses the same shared brand and nicotine pickers as Add pouch: field-width popup, capped height with scrolling, SVG arrow toggle, selection, keyboard navigation and dismissal. The existing stacked form layout and Save/Cancel behavior remain. Saving sets the defaults for future entries; previous records retain their saved values.
