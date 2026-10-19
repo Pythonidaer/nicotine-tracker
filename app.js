@@ -21,13 +21,73 @@ function pouchEntryMarkup(){
   const fields=pouchFormOpen?`<form data-kind="pouch" class="pouch-form">
     <div class="pouch-product-fields"><div><label for="entry-brand">Brand</label><select id="entry-brand" name="brand" required>${['On!','Velo','Zyn'].map(brand=>`<option ${brand===product.brand?'selected':''}>${brand}</option>`).join('')}</select></div>
     <div><label for="entry-mg">Nicotine per pouch</label><select id="entry-mg" name="mg" required>${[3,6,9,11,12,15].map(mg=>`<option value="${mg}" ${mg===product.mg?'selected':''}>${mg} mg</option>`).join('')}</select></div></div>
-    <label for="entry-activity">What are you doing? (optional)</label><select id="entry-activity" name="activity"><option value="">Not specified</option>${activityOptions.map(activity=>`<option>${activity}</option>`).join('')}</select>
+    <label id="activity-label" for="activity-trigger">What are you doing? (optional)</label>
+    <div class="activity-picker">
+      <select id="entry-activity" name="activity" hidden aria-hidden="true" tabindex="-1"><option value="">Not specified</option>${activityOptions.map(activity=>`<option>${activity}</option>`).join('')}</select>
+      <button type="button" id="activity-trigger" aria-haspopup="listbox" aria-expanded="false" aria-controls="activity-options" aria-labelledby="activity-label activity-value"><span id="activity-value">Not specified</span><svg class="chevron" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
+      <div id="activity-options" role="listbox" aria-labelledby="activity-label" hidden>${['',...activityOptions].map((activity,index)=>`<button type="button" role="option" tabindex="-1" aria-selected="${index===0}" data-activity="${activity}">${activity||'Not specified'}</button>`).join('')}</div>
+    </div>
     <div class="pouch-form-actions"><button type="submit" class="primary">Add pouch</button><button type="button" data-action="cancel-pouch">Cancel</button></div>
   </form>`:'';
   return `<section class="pouch-entry" aria-labelledby="pouch-entry-title"><div class="row pouch-entry-heading"><h2 id="pouch-entry-title">Add pouch</h2>
     ${notice?`<div class="pouch-feedback" role="status" aria-live="polite">${notice}<button type="button" class="link" data-action="undo">Undo</button></div>`:`<button type="button" class="add-entry-icon" data-action="open-pouch" aria-label="${pouchFormOpen?'Close pouch entry':'Add pouch entry'}" aria-expanded="${pouchFormOpen}" aria-controls="pouch-entry-form">${pouchFormOpen?closeEntryIcon:addEntryIcon}</button>`}
   </div><div id="pouch-entry-form" ${pouchFormOpen?'':'hidden'}>${fields}</div></section>`;
 }
+// Keep the activity popup bounded and inside the available viewport space.
+function closeActivityPicker(restoreFocus=false){
+  const list=content.querySelector('#activity-options'),trigger=content.querySelector('#activity-trigger');
+  if(!list||!trigger)return;
+  list.hidden=true;trigger.setAttribute('aria-expanded','false');
+  if(restoreFocus)trigger.focus({preventScroll:true});
+}
+function openActivityPicker(edge){
+  const list=content.querySelector('#activity-options'),trigger=content.querySelector('#activity-trigger');
+  if(!list||!trigger)return;
+  const rect=trigger.getBoundingClientRect(),viewport=window.visualViewport;
+  const viewportTop=viewport?.offsetTop||0,viewportBottom=viewportTop+(viewport?.height||window.innerHeight);
+  const below=viewportBottom-rect.bottom-12,above=rect.top-viewportTop-12;
+  const opensAbove=below<180&&above>below;
+  list.classList.toggle('opens-above',opensAbove);
+  list.style.maxHeight=`${Math.max(44,Math.min(220,opensAbove?above:below))}px`;
+  list.hidden=false;trigger.setAttribute('aria-expanded','true');
+  const options=[...list.querySelectorAll('[role="option"]')];
+  const option=edge==='first'?options[0]:edge==='last'?options.at(-1):list.querySelector('[aria-selected="true"]');
+  option.focus({preventScroll:true});option.scrollIntoView?.({block:'nearest'});
+}
+root.addEventListener('click',event=>{
+  if(event.target.closest('#activity-trigger')){
+    const open=content.querySelector('#activity-trigger').getAttribute('aria-expanded')==='true';
+    if(open)closeActivityPicker(true);else openActivityPicker();
+  }
+  const option=event.target.closest('[data-activity]');
+  if(option){
+    const select=content.querySelector('#entry-activity');select.value=option.dataset.activity;
+    content.querySelector('#activity-value').textContent=option.textContent;
+    content.querySelectorAll('[data-activity]').forEach(item=>item.setAttribute('aria-selected',String(item===option)));
+    select.dispatchEvent(new Event('change',{bubbles:true}));closeActivityPicker(true);
+  }
+});
+document.addEventListener('pointerdown',event=>{if(!event.target.closest('.activity-picker'))closeActivityPicker()});
+root.addEventListener('focusout',event=>{if(event.target.closest('.activity-picker')&&!event.relatedTarget?.closest('.activity-picker'))closeActivityPicker()});
+let activitySearch='',activitySearchTime=0;
+root.addEventListener('keydown',event=>{
+  const picker=event.target.closest('.activity-picker');if(!picker)return;
+  const list=picker.querySelector('[role="listbox"]'),options=[...list.querySelectorAll('[role="option"]')];
+  if(event.key==='Escape'&&!list.hidden){event.preventDefault();closeActivityPicker(true);return;}
+  if(event.key==='Tab'){closeActivityPicker();picker.querySelector('#activity-trigger').focus({preventScroll:true});return;}
+  if(['ArrowDown','ArrowUp','Home','End'].includes(event.key)){
+    event.preventDefault();
+    if(list.hidden){openActivityPicker(event.key==='Home'?'first':event.key==='End'?'last':undefined);return;}
+    const index=options.indexOf(document.activeElement);
+    const next=event.key==='Home'?0:event.key==='End'?options.length-1:Math.max(0,Math.min(options.length-1,index+(event.key==='ArrowDown'?1:-1)));
+    options[next].focus({preventScroll:true});options[next].scrollIntoView?.({block:'nearest'});
+  }else if(event.key.length===1&&!event.ctrlKey&&!event.metaKey&&!event.altKey&&event.key!==' '){
+    event.preventDefault();if(list.hidden)openActivityPicker();
+    const now=Date.now();activitySearch=now-activitySearchTime>700?event.key:activitySearch+event.key;activitySearchTime=now;
+    const match=options.find(option=>option.textContent.toLowerCase().startsWith(activitySearch.toLowerCase()));
+    if(match){match.focus({preventScroll:true});match.scrollIntoView?.({block:'nearest'});}
+  }
+});
 function closePouchEntry(){
   pouchFormOpen=false;clearTimeout(feedbackTimer);notice='';render();
   content.querySelector('[data-action="open-pouch"]')?.focus({preventScroll:true});

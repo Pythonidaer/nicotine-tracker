@@ -165,3 +165,14 @@ body { margin: 0; background: var(--p-bg); color: var(--p-fg); }
 #pouch-preview .pouch-form-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 12px; }
 #pouch-preview .pouch-feedback { display: flex; align-items: center; gap: 8px; color: var(--p-accent); font-size: 12px; }
 @media (max-width: 340px) { #pouch-preview .pouch-product-fields { grid-template-columns: 1fr; gap: 0; } }
+
+/* Match the activity popup to its field, with about five visible rows. */
+#pouch-preview .activity-picker { position: relative; }
+#pouch-preview #activity-trigger { width: 100%; min-height: 44px; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 8px; border: 1px solid var(--p-line); border-radius: 6px; background: var(--p-bg); color: var(--p-fg); font-family: inherit; font-size: 16px; text-align: left; }
+#pouch-preview #activity-value { min-width: 0; overflow-wrap: anywhere; }
+#pouch-preview #activity-trigger[aria-expanded="true"] .chevron { transform: rotate(180deg); }
+#pouch-preview #activity-options { position: absolute; top: calc(100% + 4px); left: 0; right: 0; z-index: 5; max-height: min(220px, 40dvh); overflow-y: auto; overscroll-behavior: contain; background: var(--p-bg); border: 1px solid var(--p-line); border-radius: 6px; padding: 4px; box-shadow: 0 6px 16px rgb(0 0 0 / 18%); }
+#pouch-preview #activity-options.opens-above { top: auto; bottom: calc(100% + 4px); }
+#pouch-preview #activity-options button { display: block; width: 100%; min-height: 44px; padding: 8px; border: 0; border-radius: 3px; font-family: inherit; font-size: 14px; text-align: left; overflow-wrap: anywhere; }
+#pouch-preview #activity-options button[aria-selected="true"] { background: var(--p-accent); color: var(--p-on); }
+#pouch-preview #activity-options button:focus-visible { outline-offset: -2px; }
