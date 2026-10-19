@@ -3,7 +3,7 @@
 Compact, offline-first PWA for personal nicotine-pouch logging. No accounts, database, or analytics services. Starts with empty logs. Defaults to Zyn 6 mg until changed in Settings.
 
 ## Features
-Pouch logging and undo; labeled mg totals; actual tin purchases; calendar-week (Monday start) and month spending; collapsed history entries with notes and deletion; seven-day trends; default product settings; validated JSON export/restore.
+Compact add-entry form with default brand/strength, optional activity, brief saved feedback and undo; labeled mg totals; actual tin purchases; calendar-week (Monday start) and month spending; collapsed history entries with notes and deletion; seven-day trends; default product settings; validated JSON export/restore.
 
 Data remains in this browser/device. Unlogged days are unknown. Export backups regularly. Labeled mg is product content, not absorbed nicotine.
 
@@ -77,3 +77,9 @@ Settings → Update app checks for a service-worker update, refreshes the curren
 In History, expand an entry using the right-hand chevron. Choose Add note or Edit note to reveal a two-line editor; save or cancel without leaving the list. The same controls are available in Recent entries. Notes are optional, up to 1,000 characters, and stored on this device alongside the entry. Saving a blank note clears it. Export/restore includes notes; older version-1 backups without notes still work. Deleting an entry also removes its note.
 
 The resource article's contents links scroll directly to their sections and move keyboard focus to the section heading. Reduced-motion preferences disable smooth scrolling.
+
+## Add a pouch entry
+
+On Today, tap the add-entry icon beside Add pouch. Brand and nicotine per pouch are prefilled from Settings. Adjust them for this entry, optionally choose what you are doing, then tap Add pouch. Saving closes the form and shows Pouch added with Undo for about four seconds before restoring the add icon. Keyboard focus on Undo keeps the feedback available. Cancel discards the unsaved entry. Per-entry changes do not overwrite your default product, and activity starts unspecified to avoid carrying a stale situation forward.
+
+Activities: Working at kiosk, Concentrating on computer, At comedy, At a movie, At home, After eating, Traveling, Taking a break, Socializing, After waking up, Other. Activity is shown in History/Recent entries and included in backups. Existing version-1 entries without activity still work. This is descriptive context, not a diagnosis or treatment recommendation.

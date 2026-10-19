@@ -45,3 +45,9 @@ Keep the skip link available for keyboard focus, hidden during ordinary touch us
 History and Recent entries use native details/summary rows with a right-aligned SVG chevron. Controls and optional saved notes stay inside the disclosure on all device sizes. A two-line note editor appears only on request; Save and Cancel operate within the row. The optional note field is included on pouch or purchase records, with a 1,000-character limit. The existing storage key and backup version remain; old backups may omit the field. Notes are escaped as plain text and validated on restore. Failed saves do not display a success message or change the stored note.
 
 Article contents links explicitly scroll to their section instead of relying on fragment navigation inside an installed PWA. Focus moves to the section heading without an extra jump; reduced-motion preferences use instant scrolling.
+
+## Add-entry form, 2026-10-19
+
+Replace the quick-log product row with a 44px icon control and an inline form. Default brand/strength come from Settings; per-entry overrides do not change defaults. Activity is optional and starts blank. Save persists a single pouch, closes the form, and replaces the icon with brief confirmation/Undo before restoring it. Only the entry section refreshes when feedback expires, preserving other open controls. Do not remove Undo while it has keyboard focus. Cancel does not persist. Failed saves roll back the attempted entry and leave the form available for retry.
+
+Optional activity is plain text on the entry, displayed with its timestamp and validated on restore (string, at most 120 characters). The storage key and version-1 backup contract remain backward compatible. Automated checks cover defaults, per-entry overrides, activity omission/selection, cancellation, timed feedback/Undo, saved totals, reload and backup round trips, invalid activity rejection, and quota-failure rollback. Device layout and timing remain for iPhone review.
