@@ -284,11 +284,11 @@ function activityChart(pouches){
   const groups=[...counts].sort((a,b)=>b[1]-a[1]||a[0].localeCompare(b[0]));
   let offset=0;
   const data=groups.map(([label,count])=>{const index=activityOptions.indexOf(label);const color=palette[index<0?11:index];const slice={label,count,color,percent:count/pouches.length*100,offset};offset+=slice.percent;return slice});
-  return `<h3>Pouches by activity</h3><p class="caption activity-total">${pouches.length} ${pouches.length===1?'pouch':'pouches'} logged</p><div class="activity-chart"><svg class="activity-pie" viewBox="0 0 200 200" role="img" aria-label="${pouches.length} pouches logged; breakdown in the activity legend">${data.map(item=>{
+  return `<h3>Pouches by activity</h3><figure class="activity-chart"><svg class="activity-pie" viewBox="0 0 200 200" role="img" aria-label="${pouches.length} pouches logged; breakdown in the activity legend">${data.map(item=>{
     if(item.percent===100)return `<circle cx="100" cy="100" r="84" fill="${item.color}"/>`;
     const point=percent=>{const angle=(percent/100*360-90)*Math.PI/180;return `${100+84*Math.cos(angle)} ${100+84*Math.sin(angle)}`};
     return `<path d="M100 100 L${point(item.offset)} A84 84 0 ${item.percent>50?1:0} 1 ${point(item.offset+item.percent)} Z" fill="${item.color}"/>`;
-  }).join('')}</svg></div><ul class="activity-legend" aria-label="Pouches by activity">${data.map(item=>`<li><span class="activity-swatch" style="background:${item.color}" aria-hidden="true"></span><span>${esc(item.label)}</span><span class="activity-share">${Math.round(item.percent)}% <small>(${item.count})</small></span></li>`).join('')}</ul>`;
+  }).join('')}</svg><figcaption class="caption activity-total">${pouches.length} ${pouches.length===1?'pouch':'pouches'}</figcaption></figure><ul class="activity-legend" aria-label="Pouches by activity">${data.map(item=>`<li><span class="activity-swatch" style="background:${item.color}" aria-hidden="true"></span><span>${esc(item.label)}</span><span class="activity-share">${Math.round(item.percent)}% <small>(${item.count})</small></span></li>`).join('')}</ul>`;
 }
 function form(kind){notice='';let fields='';
 if(kind==='product')fields=entryPicker('brand','Brand',['On!','Velo','Zyn'].map(value=>({value,label:value})),product.brand,'-default')+entryPicker('mg','Nicotine per pouch',[3,6,9,11,12,15].map(mg=>({value:String(mg),label:`${mg} mg`})),product.mg,'-default');

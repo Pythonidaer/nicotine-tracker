@@ -151,3 +151,7 @@ Trends main content uses a growing flex column; the Activities/return link has a
 ## Activity pie and labelled return icons, 2026-10-19
 
 Activities uses a full pie with a pouch-count caption above it, replacing the donut and center labels. Keep legend percentages/counts and the accessible chart name. A single category renders a full circle. Return links pair Spending trends with the same money SVG and Nicotine trends with the same pouch SVG used by the mode toggle.
+
+## Activity total figure caption, 2026-10-19
+
+Keep Pouches by activity unmodified. Show the total as a small semantic figcaption beside the pie (47 pouches), replacing the separate caption above it. Chart and caption shrink within mobile gutters.
