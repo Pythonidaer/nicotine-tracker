@@ -201,3 +201,10 @@ Verification: syntax compilation; 25 randomized nine-cell boards checked for fix
 Replace the single-block number exercise with 4×4 mini Sudoku. Each row, column and 2×2 box must contain 1–4 without repeats. Six fixed clues start a unique-solution puzzle; digit permutations, row/band and column/stack swaps, and transposition vary new boards. Use stronger middle borders to distinguish the four boxes and a four-button keypad. Adapt keyboard boundaries and conflict checks to the smaller board. Keep the elapsed timer, stop on completion, reset for New puzzle, preserve session progress and unrestricted return to logging.
 
 Verification: syntax compilation; 50 transformed boards independently checked for unique solutions and matching answers, row/column/box conflict detection, legal repeats, fixed-clue protection and completion. Generated markup has four rows, 16 cells and four number controls. Native Safari touch/layout and true offline reopening require device review.
+
+
+## 6×6 Sudoku, 2026-10-20
+
+Replace mini Sudoku with a 6×6 board using numbers 1–6. Each row, column and 2-row-by-3-column box must contain each number once. Fourteen fixed clues start a unique-solution board, varied through digit permutations and box-preserving row/band and column/stack swaps. Do not transpose rectangular boxes. Draw horizontal box dividers after rows 2 and 4 and a vertical divider after column 3; use a six-button keypad and six-cell keyboard boundaries. Keep the elapsed timer, completion stop, New puzzle reset, session progress and unrestricted return to logging.
+
+Verification: syntax compilation, taper regression, 50 transformed puzzles independently checked for uniqueness and matching solutions, rectangular-box conflict checks, legal repeats, fixed-clue protection, bounds and completion. Generated markup contains six rows, 36 cells and six number buttons. Native iOS layout/touch and true offline reopening remain for device testing.

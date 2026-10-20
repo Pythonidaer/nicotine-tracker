@@ -255,8 +255,8 @@ body { margin: 0; background: var(--p-bg); color: var(--p-fg); }
 #pouch-preview dialog::backdrop { background: rgb(0 0 0 / .6); }
 #pouch-preview .craving-break { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-top: 16px; }
 #pouch-preview .craving-clock { font: 400 24px/1.2 var(--p-heading); font-variant-numeric: tabular-nums; }
-#pouch-preview .sudoku-grid { width: 100%; max-width: 270px; margin: 12px auto; border: 2px solid var(--p-fg); }
-#pouch-preview .sudoku-row { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); }
+#pouch-preview .sudoku-grid { width: 100%; max-width: 360px; margin: 12px auto; border: 2px solid var(--p-fg); }
+#pouch-preview .sudoku-row { display: grid; grid-template-columns: repeat(6,minmax(0,1fr)); }
 #pouch-preview .sudoku-row:not(:last-child) { border-bottom: 1px solid var(--p-line); }
 #pouch-preview .sudoku-row > div:not(:last-child) { border-right: 1px solid var(--p-line); }
 #pouch-preview .sudoku-cell { display: grid; place-items: center; width: 100%; aspect-ratio: 1; min-height: 0; padding: 0; border: 0; border-radius: 0; font-family: var(--p-body); font-size: clamp(14px,4vw,21px); color: var(--p-accent); touch-action: manipulation; }
@@ -264,9 +264,9 @@ body { margin: 0; background: var(--p-bg); color: var(--p-fg); }
 #pouch-preview .sudoku-cell.selected { background: var(--p-accent); color: var(--p-on); }
 #pouch-preview .sudoku-cell.conflict { outline: 2px dashed var(--p-fg); outline-offset: -3px; }
 #pouch-preview .sudoku-cell:focus-visible { outline-offset: -3px; outline: 2px solid var(--p-fg); }
-#pouch-preview .sudoku-keypad { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: 3px; width: 100%; max-width: 396px; margin: 12px auto; }
+#pouch-preview .sudoku-keypad { display: grid; grid-template-columns: repeat(6,minmax(0,1fr)); gap: 3px; width: 100%; max-width: 396px; margin: 12px auto; }
 #pouch-preview .sudoku-keypad button { padding: 4px 0; min-width: 0; touch-action: manipulation; }
 #pouch-preview .sudoku-keypad button:disabled { opacity: .4; }
 
-#pouch-preview .sudoku-row:nth-child(2) { border-bottom: 2px solid var(--p-fg); }
-#pouch-preview .sudoku-row > div:nth-child(2) { border-right: 2px solid var(--p-fg); }
+#pouch-preview .sudoku-row:nth-child(2n):not(:last-child) { border-bottom: 2px solid var(--p-fg); }
+#pouch-preview .sudoku-row > div:nth-child(3) { border-right: 2px solid var(--p-fg); }
