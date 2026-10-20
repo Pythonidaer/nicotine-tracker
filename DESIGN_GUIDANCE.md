@@ -143,3 +143,7 @@ Preload both self-hosted TTF fonts from the document head with matching font MIM
 ## Weekly Activities trends, 2026-10-19
 
 Nicotine and spending views link to Activities at bottom right with a tag SVG. Activities retains the selected seven-day window and returns to the originating mode. Navigation uses pouch-record bounds. Donut slices count pouches equally, ignoring strength; missing/blank activities are Not specified. A text legend provides every activity, rounded percentage and count, independent of color. The center shows total pouches; empty periods show an empty state. Activity colors stay stable for standard choices across weeks. No data schema changes.
+
+## Bottom-aligned trend navigation, 2026-10-19
+
+Trends main content uses a growing flex column; the Activities/return link has an automatic top margin and safe-area-aware bottom gutter. It sits at bottom right on short pages and follows content on tall pages, without a fixed overlay or obscured controls.

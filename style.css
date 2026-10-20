@@ -234,3 +234,8 @@ body { margin: 0; background: var(--p-bg); color: var(--p-fg); }
 #pouch-preview .activity-swatch { width: 10px; height: 10px; border-radius: 2px; }
 #pouch-preview .activity-share { white-space: nowrap; font-variant-numeric: tabular-nums; }
 #pouch-preview .activity-legend li > span:nth-child(2) { overflow-wrap: anywhere; }
+
+/* Keep the trend view link at the viewport foot without covering chart content. */
+#pouch-preview main.trends-layout { display: flex; flex-direction: column; padding-bottom: max(16px, env(safe-area-inset-bottom)); }
+#pouch-preview main.trends-layout > * { flex-shrink: 0; }
+#pouch-preview .trends-layout > .trend-view-link { margin-top: auto; padding-top: 16px; }
