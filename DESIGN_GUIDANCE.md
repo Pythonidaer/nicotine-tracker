@@ -194,3 +194,10 @@ Verification: JavaScript syntax compilation; prior custom-option/backup tests; t
 Replace the full Sudoku with one 3×3 block. Three fixed numbers start each shuffled board; fill the remaining cells with 1–9, each used once. This simplified number exercise accepts any valid arrangement, without additional row/column sum rules. Keep keypad, keyboard navigation, duplicate checking, erase and New puzzle. Remove duration choices and the countdown. Show elapsed wall-clock time, stop it on completion and reset it for New puzzle. Existing games resume during the session; returning to logging remains unrestricted.
 
 Verification: syntax compilation; 25 randomized nine-cell boards checked for fixed-clue protection, duplicate detection and completion; generated three-row/nine-cell markup and elapsed/completed timer checks passed. Native iOS touch/layout and offline reopening remain for device review.
+
+
+## 4×4 mini Sudoku, 2026-10-20
+
+Replace the single-block number exercise with 4×4 mini Sudoku. Each row, column and 2×2 box must contain 1–4 without repeats. Six fixed clues start a unique-solution puzzle; digit permutations, row/band and column/stack swaps, and transposition vary new boards. Use stronger middle borders to distinguish the four boxes and a four-button keypad. Adapt keyboard boundaries and conflict checks to the smaller board. Keep the elapsed timer, stop on completion, reset for New puzzle, preserve session progress and unrestricted return to logging.
+
+Verification: syntax compilation; 50 transformed boards independently checked for unique solutions and matching answers, row/column/box conflict detection, legal repeats, fixed-clue protection and completion. Generated markup has four rows, 16 cells and four number controls. Native Safari touch/layout and true offline reopening require device review.

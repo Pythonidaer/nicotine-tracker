@@ -348,7 +348,7 @@ function updateCravingTimer(){
 function cravingMarkup(){
   ensureSudoku();
   const selected=sudokuGame.selected;
-  return '<h2 class="page-heading">Fight the craving</h2><p class="caption">Take a Sudoku break. You can return and log at any time.</p><div class="craving-break"><span id="craving-timer" class="craving-clock" role="timer" aria-label="Puzzle elapsed time"></span></div><p class="caption" id="craving-delay-status" aria-live="polite"></p><h3>Sudoku</h3><p class="caption">Fill this 3×3 block with 1–9, using each number once. Three numbers are filled in to start.</p><div class="sudoku-grid" role="grid" aria-label="Single 3 by 3 number puzzle">'+Array.from({length:3},(_,r)=>'<div class="sudoku-row" role="row">'+Array.from({length:3},(_,c)=>{const i=r*3+c,n=sudokuGame.values[i],given=!!sudokuGame.givens[i];return '<div role="gridcell" aria-selected="'+(selected===i)+'"><button type="button" class="sudoku-cell'+(given?' given':'')+(selected===i?' selected':'')+(sudokuConflicts.includes(i)?' conflict':'')+'" data-sudoku-cell="'+i+'" tabindex="'+(selected===i?'0':'-1')+'" aria-label="Row '+(r+1)+', column '+(c+1)+', '+(n||'empty')+(given?', given':'')+'" aria-disabled="'+given+'">'+(n||'')+'</button></div>'}).join('')+'</div>').join('')+'</div><div class="sudoku-keypad" role="group" aria-label="Enter a number">'+Array.from({length:9},(_,i)=>'<button type="button" data-sudoku-number="'+(i+1)+'" '+(sudokuGame.givens[selected]?'disabled':'')+'>'+(i+1)+'</button>').join('')+'</div><div class="entry-actions"><button type="button" class="link" data-sudoku-action="erase">Erase</button><button type="button" class="link" data-sudoku-action="check">Check</button><button type="button" class="link" data-sudoku-action="new">New puzzle</button></div><p class="caption setting-status" role="status" id="sudoku-status">'+esc(sudokuMessage)+'</p><div class="form-actions"><button type="button" class="primary" data-action="leave-craving">'+(pouchDraft?'Return to pouch':'Back to Today')+'</button></div>';
+  return '<h2 class="page-heading">Fight the craving</h2><p class="caption">Take a Sudoku break. You can return and log at any time.</p><div class="craving-break"><span id="craving-timer" class="craving-clock" role="timer" aria-label="Puzzle elapsed time"></span></div><p class="caption" id="craving-delay-status" aria-live="polite"></p><h3>Mini Sudoku</h3><p class="caption">Fill each row, column and 2×2 box with 1–4, without repeats.</p><div class="sudoku-grid" role="grid" aria-label="4 by 4 mini Sudoku puzzle">'+Array.from({length:4},(_,r)=>'<div class="sudoku-row" role="row">'+Array.from({length:4},(_,c)=>{const i=r*4+c,n=sudokuGame.values[i],given=!!sudokuGame.givens[i];return '<div role="gridcell" aria-selected="'+(selected===i)+'"><button type="button" class="sudoku-cell'+(given?' given':'')+(selected===i?' selected':'')+(sudokuConflicts.includes(i)?' conflict':'')+'" data-sudoku-cell="'+i+'" tabindex="'+(selected===i?'0':'-1')+'" aria-label="Row '+(r+1)+', column '+(c+1)+', '+(n||'empty')+(given?', given':'')+'" aria-disabled="'+given+'">'+(n||'')+'</button></div>'}).join('')+'</div>').join('')+'</div><div class="sudoku-keypad" role="group" aria-label="Enter a number">'+Array.from({length:4},(_,i)=>'<button type="button" data-sudoku-number="'+(i+1)+'" '+(sudokuGame.givens[selected]?'disabled':'')+'>'+(i+1)+'</button>').join('')+'</div><div class="entry-actions"><button type="button" class="link" data-sudoku-action="erase">Erase</button><button type="button" class="link" data-sudoku-action="check">Check</button><button type="button" class="link" data-sudoku-action="new">New puzzle</button></div><p class="caption setting-status" role="status" id="sudoku-status">'+esc(sudokuMessage)+'</p><div class="form-actions"><button type="button" class="primary" data-action="leave-craving">'+(pouchDraft?'Return to pouch':'Back to Today')+'</button></div>';
 }
 function refreshSudoku(focus=true){
   render();if(focus)content.querySelector('[data-sudoku-cell="'+sudokuGame.selected+'"]')?.focus({preventScroll:true});
@@ -378,7 +378,7 @@ function handleCravingClick(event){
     if(b.dataset.sudokuAction==='new'){sudokuGame=PouchSudoku.make();sudokuMessage='';sudokuConflicts=[];cravingStartedAt=Date.now();cravingFinishedAt=0;refreshSudoku();}
     if(b.dataset.sudokuAction==='check'){
       sudokuConflicts=PouchSudoku.conflicts(sudokuGame.values);
-      sudokuMessage=PouchSudoku.solved(sudokuGame)?'Puzzle complete. Well done.':sudokuConflicts.length?sudokuConflicts.length+' cells repeat a number in this block.':'No conflicts so far. '+sudokuGame.values.filter(n=>!n).length+' cells left.';
+      sudokuMessage=PouchSudoku.solved(sudokuGame)?'Puzzle complete. Well done.':sudokuConflicts.length?sudokuConflicts.length+' cells repeat a number in a row, column or 2×2 box.':'No conflicts so far. '+sudokuGame.values.filter(n=>!n).length+' cells left.';
       refreshSudoku(false);
     }return true;
   }
@@ -386,16 +386,16 @@ function handleCravingClick(event){
 }
 root.addEventListener('keydown',event=>{
   const cell=event.target.closest('[data-sudoku-cell]');if(!cell||!sudokuGame)return;
-  if(/^[1-9]$/.test(event.key)){event.preventDefault();putSudoku(Number(event.key));return;}
+  if(/^[1-4]$/.test(event.key)){event.preventDefault();putSudoku(Number(event.key));return;}
   if(['Backspace','Delete','0'].includes(event.key)){event.preventDefault();putSudoku(0);return;}
-  const index=Number(cell.dataset.sudokuCell),row=Math.floor(index/3),col=index%3;
+  const index=Number(cell.dataset.sudokuCell),row=Math.floor(index/4),col=index%4;
   let next=index;
-  if(event.key==='ArrowRight')next=row*3+Math.min(2,col+1);
-  if(event.key==='ArrowLeft')next=row*3+Math.max(0,col-1);
-  if(event.key==='ArrowDown')next=Math.min(2,row+1)*3+col;
-  if(event.key==='ArrowUp')next=Math.max(0,row-1)*3+col;
-  if(event.key==='Home')next=row*3;
-  if(event.key==='End')next=row*3+2;
+  if(event.key==='ArrowRight')next=row*4+Math.min(3,col+1);
+  if(event.key==='ArrowLeft')next=row*4+Math.max(0,col-1);
+  if(event.key==='ArrowDown')next=Math.min(3,row+1)*4+col;
+  if(event.key==='ArrowUp')next=Math.max(0,row-1)*4+col;
+  if(event.key==='Home')next=row*4;
+  if(event.key==='End')next=row*4+3;
   if(next!==index){event.preventDefault();sudokuGame.selected=next;refreshSudoku();}
 });
 

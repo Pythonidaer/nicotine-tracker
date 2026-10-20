@@ -16,24 +16,44 @@ assert.equal(T.plan(entries,{enabled:true,percent:100},now).countTarget,0);
 assert.equal(T.plan(entries.filter(e=>e.date!=='2026-10-12'),{enabled:true,percent:10},now).days,6);
 for(const percent of [-1,101,NaN,'10'])assert.throws(()=>T.read({enabled:true,percent}));
 
+function solve(values,limit=2){
+ const grid=[...values],answers=[];
+ function go(){
+  if(answers.length>=limit)return;
+  let cell=-1,choices=[];
+  for(let i=0;i<16;i++){if(grid[i])continue;const r=Math.floor(i/4),c=i%4,used=new Set();
+   for(let j=0;j<4;j++){used.add(grid[r*4+j]);used.add(grid[j*4+c]);used.add(grid[(Math.floor(r/2)*2+Math.floor(j/2))*4+Math.floor(c/2)*2+j%2]);}
+   const available=[1,2,3,4].filter(n=>!used.has(n));
+   if(!available.length)return;
+   if(cell<0||available.length<choices.length){cell=i;choices=available;}
+  }
+  if(cell<0){answers.push([...grid]);return;}
+  for(const n of choices){grid[cell]=n;go();}grid[cell]=0;
+ }go();return answers;
+}
 const variations=new Set();
-for(let i=0;i<25;i++){
+for(let i=0;i<50;i++){
   const game=S.make();variations.add(game.givens.join(''));
-  assert.equal(game.values.length,9);
-  assert.equal(game.givens.filter(Boolean).length,3);
+  assert.equal(game.values.length,16);
+  assert.equal(game.givens.filter(Boolean).length,6);
   assert.equal(S.conflicts(game.givens).length,0);
+  assert.equal(solve(game.givens).length,1);
+  assert.equal(solve(game.givens)[0].join(''),game.solution.join(''));
+  assert.equal(S.solved(game),false);
   const given=game.givens.findIndex(Boolean);
   assert.equal(S.put(game,given,0),false);
-  assert.equal(S.put(game,-1,4),false);
-  assert.equal(S.put(game,9,4),false);
-  assert.equal(S.put(game,game.selected,10),false);
-  assert.equal(S.put(game,game.selected,game.givens[given]),true);
-  assert(S.conflicts(game.values).includes(game.selected));
-  assert.equal(S.solved(game),false);
-  assert.equal(S.put(game,game.selected,0),true);
-  const remaining=[1,2,3,4,5,6,7,8,9].filter(n=>!game.givens.includes(n)).reverse();
-  game.givens.forEach((n,index)=>{if(!n)assert(S.put(game,index,remaining.pop()));});
+  for(const index of [-1,16,1.5])assert.equal(S.put(game,index,1),false);
+  for(const n of [-1,5,1.5])assert.equal(S.put(game,game.selected,n),false);
+  assert(S.put(game,game.selected,1));
+  assert(S.put(game,game.selected,0));
+  game.givens.forEach((n,index)=>{if(!n)assert(S.put(game,index,game.solution[index]));});
   assert(S.solved(game));
 }
+for(const pair of [[0,3],[0,12],[1,4]]){
+ const values=Array(16).fill(0);values[pair[0]]=values[pair[1]]=1;
+ assert.equal(S.conflicts(values).sort().join(','),pair.sort().join(','));
+}
+const validRepeat=Array(16).fill(0);validRepeat[0]=validRepeat[6]=1;
+assert.equal(S.conflicts(validRepeat).length,0);
 assert(variations.size>1);
-console.log('PASS: taper baseline and thresholds; 25 single-block puzzles, duplicates, fixed clues and completion.');
+console.log('PASS: taper baseline and thresholds; 50 unique mini Sudoku boards; row, column and box conflicts; fixed clues and completion.');
