@@ -167,3 +167,11 @@ Selected legend rows use the same accent green as resource section headings, rep
 ## Safari slice tap feedback, 2026-10-19
 
 Disable WebKit’s default tap-highlight color specifically on interactive pie slice groups, preventing a rectangular translucent overlay. Retain the selected legend color, pressed state and explicit focus-visible stroke for keyboard users. Actual iOS confirmation remains required.
+
+## User-defined brands and strengths, 2026-10-20
+
+Settings → Brands and strengths has separate Add brand and Add strength forms. Reuse shared pickers independently in Default product, Add pouch, purchase brand selection and History editing. Trim brand whitespace, reject case-insensitive duplicates, and allow finite 0–1000 mg strengths (up to two decimals in the input). Zero supports nicotine-free pouch tracking. No archive workflow. Existing logs/defaults contribute their values to option lists so historical or imported selections always resolve.
+
+Preserve pouch-tracker-v1 and version 1 backups. Add optional options: {brands:[], strengths:[]} to storage/exports, with missing options accepted in older backups. Validate custom brand/strength fields during restore, keep activity and notes, and roll back in-memory state on failed custom-option saves or restore. Do not overwrite logs when adding an option.
+
+Verification: JavaScript compilation, helper tests for custom/legacy backup validation, decimal/zero strengths, duplicate handling, historical options, and failed-save rollback; actual app initialization, generated picker markup and custom pouch persistence exercised with DOM stubs. Execution environment and browser unavailable for native Safari/layout testing; device review remains required.

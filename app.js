@@ -13,6 +13,7 @@ header.addEventListener('focusout',event=>{if(!header.contains(event.relatedTarg
 document.addEventListener('keydown',event=>{if(event.key==='Escape'&&!menu.hidden){setMenuOpen(false);menuToggle.focus()}});
 let trendOffset=0,spendingTrends=false,activityTrends=false;
 let view='today',product={brand:'Zyn',mg:6},notice='',entries=[],purchases=[];
+let customOptions={brands:[],strengths:[]};
 const localDate=d=>`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
 let lastAdded=null,pouchFormOpen=false,feedbackTimer=null;
 const activityOptions=['Working at kiosk','Concentrating on computer','At comedy','At a movie','At home','After eating','Traveling','Taking a break','Socializing','After waking up','Other'];
@@ -31,8 +32,8 @@ function entryPicker(name,label,options,value,suffix=""){
 }
 function pouchEntryMarkup(){
   const fields=pouchFormOpen?`<form data-kind="pouch" class="pouch-form">
-    <div class="pouch-product-fields"><div>${entryPicker('brand','Brand',['On!','Velo','Zyn'].map(value=>({value,label:value})),product.brand)}</div>
-    <div>${entryPicker('mg','Nicotine per pouch',[3,6,9,11,12,15].map(mg=>({value:String(mg),label:`${mg} mg`})),product.mg)}</div></div>
+    <div class="pouch-product-fields"><div>${entryPicker('brand','Brand',brandValues().map(value=>({value,label:value})),product.brand)}</div>
+    <div>${entryPicker('mg','Nicotine per pouch',strengthValues().map(mg=>({value:String(mg),label:`${mg} mg`})),product.mg)}</div></div>
     ${entryPicker('activity','What are you doing? (optional)',['',...activityOptions].map(value=>({value,label:value||'Not specified'})),'')}
     <div class="form-actions"><button type="submit" class="primary">Save</button><button type="button" data-action="cancel-pouch">Cancel</button></div>
   </form>`:'';
@@ -125,7 +126,7 @@ function schedulePouchFeedbackDismissal(){
 function addPouchFromForm(form){
   if(!pouchFormOpen)return;
   const data=new FormData(form),brand=data.get('brand'),mg=Number(data.get('mg')),activity=data.get('activity');
-  if(!['On!','Velo','Zyn'].includes(brand)||![3,6,9,11,12,15].includes(mg)||(activity&&!activityOptions.includes(activity)))return;
+  if(!brandValues().includes(brand)||!strengthValues().includes(mg)||(activity&&!activityOptions.includes(activity)))return;
   let id=Date.now();while(findEntry(id))id++;
   const entry={id,type:'pouch',brand,mg,date:localDate(new Date()),time:time()};
   if(activity)entry.activity=activity;
@@ -135,8 +136,8 @@ function addPouchFromForm(form){
   content.focus({preventScroll:true});schedulePouchFeedbackDismissal();
 }
 
-try{const saved=JSON.parse(localStorage.getItem('pouch-tracker-v1'));if(saved){product=saved.product;entries=saved.entries;purchases=saved.purchases}}catch{}
-const persist=()=>{try{localStorage.setItem('pouch-tracker-v1',JSON.stringify({version:1,product,entries,purchases}));return true}catch{alert('Could not save. Please export your data before closing the app.');return false}};
+try{const saved=JSON.parse(localStorage.getItem('pouch-tracker-v1'));if(saved){product=saved.product;entries=saved.entries;purchases=saved.purchases;customOptions=readCustomOptions(saved.options)}}catch{}
+const persist=()=>{try{localStorage.setItem('pouch-tracker-v1',JSON.stringify({version:1,product,entries,purchases,options:customOptions}));return true}catch{alert('Could not save. Please export your data before closing the app.');return false}};
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const money=n=>'$'+n.toFixed(2),time=()=>new Date().toLocaleTimeString([], {hour:'numeric',minute:'2-digit'});
 const items=()=>[...entries,...purchases].sort((a,b)=>b.id-a.id);
@@ -144,6 +145,46 @@ const entryChevron='<svg class="chevron" viewBox="0 0 24 24" width="18" height="
 const findEntry=id=>[...entries,...purchases].find(entry=>entry.id===id);
 const validOptionalActivity=entry=>entry.activity===undefined||(typeof entry.activity==='string'&&entry.activity.length<=120);
 const validOptionalNote=entry=>entry.note===undefined||(typeof entry.note==='string'&&entry.note.length<=1000);
+
+function validBrand(value){
+  return typeof value==='string'&&value===value.trim()&&value.length>0&&value.length<=60&&!/[\u0000-\u001f\u007f]/.test(value);
+}
+function validStrength(value){return typeof value==='number'&&Number.isFinite(value)&&value>=0&&value<=1000;}
+function readCustomOptions(options){
+  if(options===undefined)return {brands:[],strengths:[]};
+  if(!options||!Array.isArray(options.brands)||!Array.isArray(options.strengths)||!options.brands.every(validBrand)||!options.strengths.every(validStrength))throw Error('Invalid product options');
+  return {brands:uniqueBrands(options.brands),strengths:[...new Set(options.strengths)].sort((a,b)=>a-b)};
+}
+function uniqueBrands(values){
+  const found=new Set();return values.filter(value=>{const key=value.toLocaleLowerCase();if(found.has(key))return false;found.add(key);return true;});
+}
+function brandValues(){
+  // Retain exact historical spellings so old record selections always resolve.
+  return [...new Set(['On!','Velo','Zyn',...customOptions.brands,product.brand,...entries.map(e=>e.brand),...purchases.map(e=>e.brand)].filter(validBrand))];
+}
+function strengthValues(){
+  return [...new Set([3,6,9,11,12,15,...customOptions.strengths,product.mg,...entries.filter(e=>e.type==='pouch').map(e=>e.mg)].filter(validStrength))].sort((a,b)=>a-b);
+}
+function validBackup(data){
+  if(!data||data.version!==1||!validBrand(data.product?.brand)||!validStrength(data.product?.mg)||!Array.isArray(data.entries)||!Array.isArray(data.purchases))return false;
+  try{readCustomOptions(data.options)}catch{return false}
+  const common=entry=>entry&&validBrand(entry.brand)&&validOptionalNote(entry)&&validOptionalActivity(entry)&&Number.isFinite(entry.id)&&/^\d{4}-\d{2}-\d{2}$/.test(entry.date)&&typeof entry.time==='string';
+  return data.entries.every(entry=>common(entry)&&entry.type==='pouch'&&validStrength(entry.mg))&&data.purchases.every(entry=>common(entry)&&entry.type==='purchase'&&Number.isInteger(entry.tins)&&entry.tins>0&&Number.isFinite(entry.amount)&&entry.amount>=0);
+}
+function saveCustomOption(form,kind,data){
+  const input=form.elements.value;
+  const value=kind==='brand-option'?String(data.get('value')||'').trim().replace(/\s+/g,' '):Number(data.get('value'));
+  const valid=kind==='brand-option'?validBrand(value):String(data.get('value')||'').trim()!==''&&validStrength(value);
+  const duplicate=kind==='brand-option'?brandValues().some(brand=>brand.toLocaleLowerCase()===String(value).toLocaleLowerCase()):strengthValues().includes(value);
+  input.setCustomValidity(!valid?'Enter a valid '+(kind==='brand-option'?'brand name (up to 60 characters).':'nicotine strength between 0 and 1000 mg.'):duplicate?'This option already exists.':'');
+  if(!valid||duplicate){input.reportValidity();return;}
+  const previous=customOptions;
+  customOptions={brands:[...previous.brands],strengths:[...previous.strengths]};
+  customOptions[kind==='brand-option'?'brands':'strengths'].push(value);
+  if(!persist()){customOptions=previous;return;}
+  render();const status=content.querySelector('#product-options-status');if(status)status.textContent=kind==='brand-option'?'Brand added.':'Nicotine strength added.';
+}
+
 function historyDate(date){
   return new Date(`${date}T12:00:00`).toLocaleDateString([], {weekday:'short',month:'short',day:'numeric'});
 }
@@ -188,10 +229,10 @@ function editRecord(button,editing){
   const preview=row.querySelector('.entry-note');if(preview)preview.hidden=editing;
   if(!editing){editor.innerHTML='';row.querySelector('[data-edit]').focus({preventScroll:true});return;}
   const entry=findEntry(Number(row.dataset.entryId));if(!entry)return;
-  const suffix=`-${entry.id}`,brands=['On!','Velo','Zyn'].map(value=>({value,label:value}));
+  const suffix=`-${entry.id}`,brands=brandValues().map(value=>({value,label:value}));
   let fields=entryPicker('brand','Brand',brands,entry.brand,suffix);
   if(entry.type==='pouch'){
-    fields=`<div class="pouch-product-fields"><div>${fields}</div><div>${entryPicker('mg','Nicotine per pouch',[3,6,9,11,12,15].map(mg=>({value:String(mg),label:`${mg} mg`})),entry.mg,suffix)}</div></div>`;
+    fields=`<div class="pouch-product-fields"><div>${fields}</div><div>${entryPicker('mg','Nicotine per pouch',strengthValues().map(mg=>({value:String(mg),label:`${mg} mg`})),entry.mg,suffix)}</div></div>`;
     const activities=['',...activityOptions];
     // Preserve an existing activity from a backup even if it is not in today's list.
     if(entry.activity&&!activities.includes(entry.activity))activities.push(entry.activity);
@@ -206,13 +247,13 @@ function editRecord(button,editing){
 function saveRecord(form){
   const id=Number(form.dataset.id),entry=findEntry(id);if(!entry)return;
   const data=new FormData(form),brand=data.get('brand'),note=data.get('note').trim();
-  if(!['On!','Velo','Zyn'].includes(brand))return;
+  if(!brandValues().includes(brand))return;
   if(note.length>1000){form.elements.note.setCustomValidity('Keep your note to 1,000 characters or fewer.');form.elements.note.reportValidity();return;}
   form.elements.note.setCustomValidity('');
   const updated={...entry,brand};
   if(entry.type==='pouch'){
     const mg=Number(data.get('mg')),activity=data.get('activity');
-    if(![3,6,9,11,12,15].includes(mg)||typeof activity!=='string'||activity.length>120||(!activityOptions.includes(activity)&&activity!==''&&activity!==entry.activity))return;
+    if(!strengthValues().includes(mg)||typeof activity!=='string'||activity.length>120||(!activityOptions.includes(activity)&&activity!==''&&activity!==entry.activity))return;
     updated.mg=mg;if(activity)updated.activity=activity;else delete updated.activity;
   }else if(entry.type==='purchase'){
     const tins=Number(data.get('tins')),amount=Number(data.get('amount')),date=data.get('date');
@@ -245,7 +286,7 @@ if(view==='today')content.innerHTML=`${pouchEntryMarkup()}<h3>Summary</h3><div c
 if(view==='history')content.innerHTML=`<h2 class="page-heading">History</h2>${weeklyHistory()}`;
 if(view==='trends')content.innerHTML=trendsMarkup(monthSpent);
 if(view==='resources')content.innerHTML=window.pouchResources;
-if(view==='settings')content.innerHTML=`<h2 class="page-heading">Settings</h2><section class="settings-section" aria-labelledby="default-product-title"><h3 id="default-product-title">Default product</h3><div class="row"><span>${esc(product.brand)}, ${product.mg} mg</span><button class="link" data-action="product">Change</button></div></section><section class="settings-section" aria-labelledby="your-data-title"><h3 id="your-data-title">Your data</h3><p class="caption entry-note">Logs are saved on this device. Export a backup before clearing browser data or switching phones.</p><div class="entry-actions"><button class="link" data-action="export">Export backup</button><button class="link" data-action="restore">Restore backup</button></div><input type="file" id="backup-file" accept="application/json,.json" hidden></section><section class="settings-section" aria-labelledby="app-updates-title"><h3 id="app-updates-title">App updates</h3><div class="caption">Check for the latest app files and reload. Your saved logs and settings stay on this device.</div><div class="form-actions"><button class="primary" data-action="update">Update app</button></div><p id="update-status" role="status" aria-live="polite"></p></section>`;
+if(view==='settings')content.innerHTML=`<h2 class="page-heading">Settings</h2><section class="settings-section" aria-labelledby="default-product-title"><h3 id="default-product-title">Default product</h3><div class="row"><span>${esc(product.brand)}, ${product.mg} mg</span><button class="link" data-action="product">Change</button></div></section><section class="settings-section" aria-labelledby="product-options-title"><h3 id="product-options-title">Brands and strengths</h3><p class="caption">Brands: ${brandValues().map(esc).join(', ')}</p><p class="caption">Nicotine: ${strengthValues().map(mg=>mg+' mg').join(', ')}</p><div class="entry-actions"><button class="link" data-action="brand-option">Add brand</button><button class="link" data-action="strength-option">Add strength</button></div><p class="caption" id="product-options-status" role="status" aria-live="polite"></p></section><section class="settings-section" aria-labelledby="your-data-title"><h3 id="your-data-title">Your data</h3><p class="caption entry-note">Logs are saved on this device. Export a backup before clearing browser data or switching phones.</p><div class="entry-actions"><button class="link" data-action="export">Export backup</button><button class="link" data-action="restore">Restore backup</button></div><input type="file" id="backup-file" accept="application/json,.json" hidden></section><section class="settings-section" aria-labelledby="app-updates-title"><h3 id="app-updates-title">App updates</h3><div class="caption">Check for the latest app files and reload. Your saved logs and settings stay on this device.</div><div class="form-actions"><button class="primary" data-action="update">Update app</button></div><p id="update-status" role="status" aria-live="polite"></p></section>`;
 }
 function trendModeIcon(spending){
   return `<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">${spending?'<rect x="3" y="3" width="18" height="18" rx="2"/><path d="M12 5v14m4-11c-1-2-8-2-8 1 0 4 8 2 8 6 0 3-7 3-8 1"/>':'<rect x="6" y="3" width="12" height="18" rx="5"/><path d="M8 10h8"/>'}</svg>`;
@@ -298,10 +339,12 @@ function selectActivitySlice(slice){
 }
 root.addEventListener('keydown',event=>{const slice=event.target.closest('[data-activity-slice]');if(slice&&(event.key==='Enter'||event.key===' ')){event.preventDefault();selectActivitySlice(slice)}});
 function form(kind){notice='';let fields='';
-if(kind==='product')fields=entryPicker('brand','Brand',['On!','Velo','Zyn'].map(value=>({value,label:value})),product.brand,'-default')+entryPicker('mg','Nicotine per pouch',[3,6,9,11,12,15].map(mg=>({value:String(mg),label:`${mg} mg`})),product.mg,'-default');
+if(kind==='brand-option')fields='<label for="custom-brand">Brand</label><input id="custom-brand" name="value" type="text" maxlength="60" required autocomplete="off" placeholder="Crave">';
+if(kind==='strength-option')fields='<label for="custom-strength">Nicotine per pouch (mg)</label><input id="custom-strength" name="value" type="number" min="0" max="1000" step="0.01" inputmode="decimal" required>';
+if(kind==='product')fields=entryPicker('brand','Brand',brandValues().map(value=>({value,label:value})),product.brand,'-default')+entryPicker('mg','Nicotine per pouch',strengthValues().map(mg=>({value:String(mg),label:`${mg} mg`})),product.mg,'-default');
 if(kind==='craving')fields=`<label for="pp-intensity">Intensity · 1 mild, 5 strongest</label><select id="pp-intensity" name="intensity">${[1,2,3,4,5].map(n=>`<option ${n===3?'selected':''}>${n}</option>`).join('')}</select><label for="pp-replacement">Replacement or delay · optional</label><input id="pp-replacement" name="replacement" placeholder="e.g. gum, walk, wait 10 minutes" maxlength="120">`;
-if(kind==='purchase')fields=`${entryPicker('brand','Brand',['On!','Velo','Zyn'].map(value=>({value,label:value})),'Zyn','-purchase')}<label for="pp-tins">Number of tins</label><input id="pp-tins" name="tins" type="number" min="1" step="1" required value="1"><label for="pp-amount">Total paid ($)</label><input id="pp-amount" name="amount" type="number" min="0" step="0.01" required placeholder="8.00"><label for="pp-date">Purchase date</label><input id="pp-date" name="date" type="date" required value="${localDate(new Date())}">`;
-content.innerHTML=`<h2>${kind==='product'?'Change product':kind==='craving'?'Log craving':'Log purchase'}</h2><form data-kind="${kind}">${fields}<div class="form-actions"><button class="primary" type="submit">Save</button><button type="button" data-action="cancel">Cancel</button></div></form>`;
+if(kind==='purchase')fields=`${entryPicker('brand','Brand',brandValues().map(value=>({value,label:value})),'Zyn','-purchase')}<label for="pp-tins">Number of tins</label><input id="pp-tins" name="tins" type="number" min="1" step="1" required value="1"><label for="pp-amount">Total paid ($)</label><input id="pp-amount" name="amount" type="number" min="0" step="0.01" required placeholder="8.00"><label for="pp-date">Purchase date</label><input id="pp-date" name="date" type="date" required value="${localDate(new Date())}">`;
+content.innerHTML=`<h2>${kind==='brand-option'?'Add brand':kind==='strength-option'?'Add strength':kind==='product'?'Change product':kind==='craving'?'Log craving':'Log purchase'}</h2><form data-kind="${kind}">${fields}<div class="form-actions"><button class="primary" type="submit">Save</button><button type="button" data-action="cancel">Cancel</button></div></form>`;
 }
 async function updateApp(button){
 const status=root.querySelector('#update-status');
@@ -336,10 +379,21 @@ try{
   location.reload();
 }catch(error){status.textContent=error.message||'Could not update. Check your connection and try again.';button.disabled=false;}
 }
-root.addEventListener('click',e=>{const slice=e.target.closest('[data-activity-slice]');if(slice){selectActivitySlice(slice);return;}const articleLink=e.target.closest('.resource-contents a[href^="#"]');if(articleLink){e.preventDefault();scrollToResourceSection(articleLink);return;}const b=e.target.closest('button, .brand');if(!b)return;if(b.dataset.day!==undefined){const shown=b.getAttribute('aria-pressed')==='true';content.querySelectorAll('.trend-day').forEach(day=>{day.setAttribute('aria-pressed','false');day.querySelector('.bar-nicotine').hidden=true;});if(!shown){b.setAttribute('aria-pressed','true');b.querySelector('.bar-nicotine').hidden=false;}return;}if(b.dataset.trend){trendOffset=Math.max(0,trendOffset+(b.dataset.trend==='previous'?1:-1));render();return;}if(b.dataset.edit){editRecord(b,true);return;}if(b.dataset.editCancel){editRecord(b,false);return;}if(b.dataset.view){e.preventDefault();setMenuOpen(false);view=b.dataset.view;notice='';pouchFormOpen=false;clearTimeout(feedbackTimer);render();content.focus({preventScroll:true});window.scrollTo({top:0,behavior:'instant'});return}if(b.dataset.delete){const id=Number(b.dataset.delete);entries=entries.filter(x=>x.id!==id);purchases=purchases.filter(x=>x.id!==id);persist();notice='';render();return}const a=b.dataset.action;if(a==='activities'||a==='close-activities'){activityTrends=a==='activities';render();content.focus({preventScroll:true});window.scrollTo({top:0,behavior:'instant'});return;}if(a==='toggle-trends'){spendingTrends=!spendingTrends;trendOffset=0;render();return;}if(a==='update'){updateApp(b);return}if(a==='open-pouch'){if(pouchFormOpen){closePouchEntry();return;}pouchFormOpen=true;notice='';clearTimeout(feedbackTimer);render();content.querySelector('[data-action="open-pouch"]').focus({preventScroll:true});}else if(a==='cancel-pouch'){closePouchEntry();}else if(a==='undo'){const previous=entries;entries=entries.filter(e=>e.id!==lastAdded);if(!persist()){entries=previous;return;}closePouchEntry();}else if(a==='export'){const blob=new Blob([JSON.stringify({version:1,product,entries,purchases},null,2)],{type:'application/json'});const url=URL.createObjectURL(blob),link=document.createElement('a');link.href=url;link.download='pouch-tracker-backup.json';link.click();setTimeout(()=>URL.revokeObjectURL(url),1000)}else if(a==='restore'){root.querySelector('#backup-file').click()}else if(a==='cancel')render();else if(a)form(a)});
-root.addEventListener('input',e=>{if(e.target.matches('.record-form textarea'))e.target.setCustomValidity('')});
-root.addEventListener('submit',e=>{e.preventDefault();const f=e.target,d=new FormData(f),kind=f.dataset.kind;if(kind==='pouch'){addPouchFromForm(f);return;}if(kind==='record'){saveRecord(f);return;}if(kind==='product')product={brand:d.get('brand'),mg:Number(d.get('mg'))};else if(kind==='craving')entries.unshift({id:Date.now(),type:kind,intensity:Number(d.get('intensity')),replacement:d.get('replacement'),time:time()});else purchases.unshift({id:Date.now(),type:kind,brand:d.get('brand'),tins:Number(d.get('tins')),amount:Number(d.get('amount')),date:d.get('date'),time:d.get('date')});persist();render()});
-root.addEventListener('change',async e=>{if(e.target.id!=='backup-file'||!e.target.files[0])return;try{const d=JSON.parse(await e.target.files[0].text());const strengths=[3,6,9,11,12,15],brands=['On!','Velo','Zyn'];if(d.version!==1||!brands.includes(d.product?.brand)||!strengths.includes(d.product?.mg)||!Array.isArray(d.entries)||!Array.isArray(d.purchases))throw Error();if(!d.entries.every(x=>validOptionalNote(x)&&validOptionalActivity(x)&&x.type==='pouch'&&brands.includes(x.brand)&&strengths.includes(x.mg)&&Number.isFinite(x.id)&&/^\d{4}-\d{2}-\d{2}$/.test(x.date)&&typeof x.time==='string')||!d.purchases.every(x=>validOptionalNote(x)&&validOptionalActivity(x)&&x.type==='purchase'&&brands.includes(x.brand)&&Number.isFinite(x.id)&&Number.isInteger(x.tins)&&x.tins>0&&Number.isFinite(x.amount)&&x.amount>=0&&/^\d{4}-\d{2}-\d{2}$/.test(x.date)&&typeof x.time==='string'))throw Error();if(!confirm('Replace device logs with this backup?'))return;product=d.product;entries=d.entries;purchases=d.purchases;persist();render();alert('Backup restored.')}catch{alert('This is not a valid Pouch Tracker backup.')}});
+root.addEventListener('click',e=>{const slice=e.target.closest('[data-activity-slice]');if(slice){selectActivitySlice(slice);return;}const articleLink=e.target.closest('.resource-contents a[href^="#"]');if(articleLink){e.preventDefault();scrollToResourceSection(articleLink);return;}const b=e.target.closest('button, .brand');if(!b)return;if(b.dataset.day!==undefined){const shown=b.getAttribute('aria-pressed')==='true';content.querySelectorAll('.trend-day').forEach(day=>{day.setAttribute('aria-pressed','false');day.querySelector('.bar-nicotine').hidden=true;});if(!shown){b.setAttribute('aria-pressed','true');b.querySelector('.bar-nicotine').hidden=false;}return;}if(b.dataset.trend){trendOffset=Math.max(0,trendOffset+(b.dataset.trend==='previous'?1:-1));render();return;}if(b.dataset.edit){editRecord(b,true);return;}if(b.dataset.editCancel){editRecord(b,false);return;}if(b.dataset.view){e.preventDefault();setMenuOpen(false);view=b.dataset.view;notice='';pouchFormOpen=false;clearTimeout(feedbackTimer);render();content.focus({preventScroll:true});window.scrollTo({top:0,behavior:'instant'});return}if(b.dataset.delete){const id=Number(b.dataset.delete);entries=entries.filter(x=>x.id!==id);purchases=purchases.filter(x=>x.id!==id);persist();notice='';render();return}const a=b.dataset.action;if(a==='activities'||a==='close-activities'){activityTrends=a==='activities';render();content.focus({preventScroll:true});window.scrollTo({top:0,behavior:'instant'});return;}if(a==='toggle-trends'){spendingTrends=!spendingTrends;trendOffset=0;render();return;}if(a==='update'){updateApp(b);return}if(a==='open-pouch'){if(pouchFormOpen){closePouchEntry();return;}pouchFormOpen=true;notice='';clearTimeout(feedbackTimer);render();content.querySelector('[data-action="open-pouch"]').focus({preventScroll:true});}else if(a==='cancel-pouch'){closePouchEntry();}else if(a==='undo'){const previous=entries;entries=entries.filter(e=>e.id!==lastAdded);if(!persist()){entries=previous;return;}closePouchEntry();}else if(a==='export'){const blob=new Blob([JSON.stringify({version:1,product,entries,purchases,options:customOptions},null,2)],{type:'application/json'});const url=URL.createObjectURL(blob),link=document.createElement('a');link.href=url;link.download='pouch-tracker-backup.json';link.click();setTimeout(()=>URL.revokeObjectURL(url),1000)}else if(a==='restore'){root.querySelector('#backup-file').click()}else if(a==='cancel')render();else if(a)form(a)});
+root.addEventListener('input',e=>{if(e.target.matches('[name="value"],.record-form textarea'))e.target.setCustomValidity('')});
+root.addEventListener('submit',e=>{e.preventDefault();const f=e.target,d=new FormData(f),kind=f.dataset.kind;if(kind==='brand-option'||kind==='strength-option'){saveCustomOption(f,kind,d);return;}if(kind==='pouch'){addPouchFromForm(f);return;}if(kind==='record'){saveRecord(f);return;}const previousProduct=product,previousPurchases=[...purchases];if(kind==='product'){const brand=d.get('brand'),mg=Number(d.get('mg'));if(!brandValues().includes(brand)||!strengthValues().includes(mg))return;product={brand,mg};}else if(kind==='craving')entries.unshift({id:Date.now(),type:kind,intensity:Number(d.get('intensity')),replacement:d.get('replacement'),time:time()});else purchases.unshift({id:Date.now(),type:kind,brand:d.get('brand'),tins:Number(d.get('tins')),amount:Number(d.get('amount')),date:d.get('date'),time:d.get('date')});if(!persist()){product=previousProduct;purchases=previousPurchases;return;}render()});
+root.addEventListener('change',async e=>{
+  if(e.target.id!=='backup-file'||!e.target.files[0])return;
+  let backup;
+  try{backup=JSON.parse(await e.target.files[0].text());if(!validBackup(backup))throw Error();}
+  catch{alert('This is not a valid Pouch Tracker backup.');e.target.value='';return;}
+  if(!confirm('Replace device logs with this backup?')){e.target.value='';return;}
+  const previous={product,entries,purchases,customOptions};
+  product=backup.product;entries=backup.entries;purchases=backup.purchases;customOptions=readCustomOptions(backup.options);
+  if(!persist()){({product,entries,purchases,customOptions}=previous);e.target.value='';return;}
+  render();alert('Backup restored.');
+});
+
 render();
 if('serviceWorker' in navigator)navigator.serviceWorker.register('./sw.js');
 })();
