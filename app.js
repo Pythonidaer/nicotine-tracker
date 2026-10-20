@@ -15,7 +15,7 @@ let trendOffset=0,spendingTrends=false,activityTrends=false;
 let view='today',product={brand:'Zyn',mg:6},notice='',entries=[],purchases=[];
 let customOptions={brands:[],strengths:[]};
 let tapering=PouchTaper.read(),pouchDraft=null,pendingPouch=null,skipCravingPrompt=false;
-let sudokuGame=null,cravingDeadline=0,cravingMinutes=5,cravingTimer=null,sudokuMessage='',sudokuConflicts=[];
+let sudokuGame=null,cravingStartedAt=0,cravingFinishedAt=0,cravingTimer=null,sudokuMessage='',sudokuConflicts=[];
 const localDate=d=>`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
 let lastAdded=null,pouchFormOpen=false,feedbackTimer=null;
 const activityOptions=['Working at kiosk','Concentrating on computer','At comedy','At a movie','At home','After eating','Traveling','Taking a break','Socializing','After waking up','Other'];
@@ -334,28 +334,28 @@ function saveTaperingControl(input){
 root.addEventListener('change',e=>{if(e.target.id==='taper-enabled')saveTaperingControl(e.target)});
 root.addEventListener('input',e=>{if(e.target.id==='taper-percent')saveTaperingControl(e.target)});
 function ensureSudoku(){
-  if(!sudokuGame){sudokuGame=PouchSudoku.make();cravingDeadline=Date.now()+cravingMinutes*60000;}
+  if(!sudokuGame){sudokuGame=PouchSudoku.make();cravingStartedAt=Date.now();cravingFinishedAt=0;}
 }
 function updateCravingTimer(){
   if(view!=='craving')return;
   const timer=content.querySelector('#craving-timer');if(!timer)return;
-  const seconds=Math.max(0,Math.ceil((cravingDeadline-Date.now())/1000));
+  const seconds=Math.max(0,Math.floor(((cravingFinishedAt||Date.now())-cravingStartedAt)/1000));
   timer.textContent=Math.floor(seconds/60)+':'+String(seconds%60).padStart(2,'0');
   const status=content.querySelector('#craving-delay-status');
-  const message=seconds?'Time remaining in your break':'Your break is complete. You can keep playing or return.';
+  const message=cravingFinishedAt?'Puzzle complete. Time taken shown above.':'Time spent on this puzzle';
   if(status&&status.textContent!==message)status.textContent=message;
 }
 function cravingMarkup(){
   ensureSudoku();
   const selected=sudokuGame.selected;
-  return '<h2 class="page-heading">Fight the craving</h2><p class="caption">Take a Sudoku break. You can return and log at any time.</p><div class="craving-break"><div class="craving-duration" role="group" aria-label="Break duration"><button type="button" data-craving-minutes="5" aria-pressed="'+(cravingMinutes===5)+'">5 min</button><button type="button" data-craving-minutes="10" aria-pressed="'+(cravingMinutes===10)+'">10 min</button></div><span id="craving-timer" class="craving-clock" role="timer" aria-label="Break time remaining"></span></div><p class="caption" id="craving-delay-status" aria-live="polite"></p><h3>Sudoku</h3><p class="caption">Fill each row, column and 3×3 box with 1–9, without repeats.</p><div class="sudoku-grid" role="grid" aria-label="Sudoku puzzle">'+Array.from({length:9},(_,r)=>'<div class="sudoku-row" role="row">'+Array.from({length:9},(_,c)=>{const i=r*9+c,n=sudokuGame.values[i],given=!!sudokuGame.givens[i];return '<div role="gridcell" aria-selected="'+(selected===i)+'"><button type="button" class="sudoku-cell'+(given?' given':'')+(selected===i?' selected':'')+(sudokuConflicts.includes(i)?' conflict':'')+'" data-sudoku-cell="'+i+'" tabindex="'+(selected===i?'0':'-1')+'" aria-label="Row '+(r+1)+', column '+(c+1)+', '+(n||'empty')+(given?', given':'')+'" aria-disabled="'+given+'">'+(n||'')+'</button></div>'}).join('')+'</div>').join('')+'</div><div class="sudoku-keypad" role="group" aria-label="Enter a number">'+Array.from({length:9},(_,i)=>'<button type="button" data-sudoku-number="'+(i+1)+'" '+(sudokuGame.givens[selected]?'disabled':'')+'>'+(i+1)+'</button>').join('')+'</div><div class="entry-actions"><button type="button" class="link" data-sudoku-action="erase">Erase</button><button type="button" class="link" data-sudoku-action="check">Check</button><button type="button" class="link" data-sudoku-action="new">New puzzle</button></div><p class="caption setting-status" role="status" id="sudoku-status">'+esc(sudokuMessage)+'</p><div class="form-actions"><button type="button" class="primary" data-action="leave-craving">'+(pouchDraft?'Return to pouch':'Back to Today')+'</button></div>';
+  return '<h2 class="page-heading">Fight the craving</h2><p class="caption">Take a Sudoku break. You can return and log at any time.</p><div class="craving-break"><span id="craving-timer" class="craving-clock" role="timer" aria-label="Puzzle elapsed time"></span></div><p class="caption" id="craving-delay-status" aria-live="polite"></p><h3>Sudoku</h3><p class="caption">Fill this 3×3 block with 1–9, using each number once. Three numbers are filled in to start.</p><div class="sudoku-grid" role="grid" aria-label="Single 3 by 3 number puzzle">'+Array.from({length:3},(_,r)=>'<div class="sudoku-row" role="row">'+Array.from({length:3},(_,c)=>{const i=r*3+c,n=sudokuGame.values[i],given=!!sudokuGame.givens[i];return '<div role="gridcell" aria-selected="'+(selected===i)+'"><button type="button" class="sudoku-cell'+(given?' given':'')+(selected===i?' selected':'')+(sudokuConflicts.includes(i)?' conflict':'')+'" data-sudoku-cell="'+i+'" tabindex="'+(selected===i?'0':'-1')+'" aria-label="Row '+(r+1)+', column '+(c+1)+', '+(n||'empty')+(given?', given':'')+'" aria-disabled="'+given+'">'+(n||'')+'</button></div>'}).join('')+'</div>').join('')+'</div><div class="sudoku-keypad" role="group" aria-label="Enter a number">'+Array.from({length:9},(_,i)=>'<button type="button" data-sudoku-number="'+(i+1)+'" '+(sudokuGame.givens[selected]?'disabled':'')+'>'+(i+1)+'</button>').join('')+'</div><div class="entry-actions"><button type="button" class="link" data-sudoku-action="erase">Erase</button><button type="button" class="link" data-sudoku-action="check">Check</button><button type="button" class="link" data-sudoku-action="new">New puzzle</button></div><p class="caption setting-status" role="status" id="sudoku-status">'+esc(sudokuMessage)+'</p><div class="form-actions"><button type="button" class="primary" data-action="leave-craving">'+(pouchDraft?'Return to pouch':'Back to Today')+'</button></div>';
 }
 function refreshSudoku(focus=true){
   render();if(focus)content.querySelector('[data-sudoku-cell="'+sudokuGame.selected+'"]')?.focus({preventScroll:true});
 }
 function putSudoku(value){
   if(!sudokuGame||!PouchSudoku.put(sudokuGame,sudokuGame.selected,value))return;
-  sudokuConflicts=[];sudokuMessage=PouchSudoku.solved(sudokuGame)?'Puzzle complete. Well done.':'';refreshSudoku();
+  sudokuConflicts=[];cravingFinishedAt=PouchSudoku.solved(sudokuGame)?(cravingFinishedAt||Date.now()):0;sudokuMessage=PouchSudoku.solved(sudokuGame)?'Puzzle complete. Well done.':'';refreshSudoku();
 }
 function handleCravingClick(event){
   const b=event.target.closest('button');if(!b)return false;
@@ -366,20 +366,19 @@ function handleCravingClick(event){
   }
   if(action==='prompt-sudoku'){
     root.querySelector('#craving-prompt').close();skipCravingPrompt=true;view='craving';pouchFormOpen=false;notice='';
-    ensureSudoku();cravingDeadline=Date.now()+cravingMinutes*60000;render();content.focus({preventScroll:true});window.scrollTo({top:0,behavior:'instant'});return true;
+    ensureSudoku();render();content.focus({preventScroll:true});window.scrollTo({top:0,behavior:'instant'});return true;
   }
   if(action==='leave-craving'){
     view='today';pouchFormOpen=!!pouchDraft;render();content.focus({preventScroll:true});window.scrollTo({top:0,behavior:'instant'});return true;
   }
   if(b.dataset.sudokuCell!==undefined){sudokuGame.selected=Number(b.dataset.sudokuCell);sudokuMessage='';refreshSudoku();return true;}
   if(b.dataset.sudokuNumber!==undefined){putSudoku(Number(b.dataset.sudokuNumber));return true;}
-  if(b.dataset.cravingMinutes){cravingMinutes=Number(b.dataset.cravingMinutes);cravingDeadline=Date.now()+cravingMinutes*60000;refreshSudoku(false);return true;}
   if(b.dataset.sudokuAction){
     if(b.dataset.sudokuAction==='erase')putSudoku(0);
-    if(b.dataset.sudokuAction==='new'){sudokuGame=PouchSudoku.make();sudokuMessage='';sudokuConflicts=[];cravingDeadline=Date.now()+cravingMinutes*60000;refreshSudoku();}
+    if(b.dataset.sudokuAction==='new'){sudokuGame=PouchSudoku.make();sudokuMessage='';sudokuConflicts=[];cravingStartedAt=Date.now();cravingFinishedAt=0;refreshSudoku();}
     if(b.dataset.sudokuAction==='check'){
       sudokuConflicts=PouchSudoku.conflicts(sudokuGame.values);
-      sudokuMessage=PouchSudoku.solved(sudokuGame)?'Puzzle complete. Well done.':sudokuConflicts.length?sudokuConflicts.length+' cells repeat a number in a row, column or box.':'No conflicts so far. '+sudokuGame.values.filter(n=>!n).length+' cells left.';
+      sudokuMessage=PouchSudoku.solved(sudokuGame)?'Puzzle complete. Well done.':sudokuConflicts.length?sudokuConflicts.length+' cells repeat a number in this block.':'No conflicts so far. '+sudokuGame.values.filter(n=>!n).length+' cells left.';
       refreshSudoku(false);
     }return true;
   }
@@ -389,14 +388,14 @@ root.addEventListener('keydown',event=>{
   const cell=event.target.closest('[data-sudoku-cell]');if(!cell||!sudokuGame)return;
   if(/^[1-9]$/.test(event.key)){event.preventDefault();putSudoku(Number(event.key));return;}
   if(['Backspace','Delete','0'].includes(event.key)){event.preventDefault();putSudoku(0);return;}
-  const index=Number(cell.dataset.sudokuCell),row=Math.floor(index/9),col=index%9;
+  const index=Number(cell.dataset.sudokuCell),row=Math.floor(index/3),col=index%3;
   let next=index;
-  if(event.key==='ArrowRight')next=row*9+Math.min(8,col+1);
-  if(event.key==='ArrowLeft')next=row*9+Math.max(0,col-1);
-  if(event.key==='ArrowDown')next=Math.min(8,row+1)*9+col;
-  if(event.key==='ArrowUp')next=Math.max(0,row-1)*9+col;
-  if(event.key==='Home')next=row*9;
-  if(event.key==='End')next=row*9+8;
+  if(event.key==='ArrowRight')next=row*3+Math.min(2,col+1);
+  if(event.key==='ArrowLeft')next=row*3+Math.max(0,col-1);
+  if(event.key==='ArrowDown')next=Math.min(2,row+1)*3+col;
+  if(event.key==='ArrowUp')next=Math.max(0,row-1)*3+col;
+  if(event.key==='Home')next=row*3;
+  if(event.key==='End')next=row*3+2;
   if(next!==index){event.preventDefault();sudokuGame.selected=next;refreshSudoku();}
 });
 
