@@ -14,6 +14,8 @@ document.addEventListener('keydown',event=>{if(event.key==='Escape'&&!menu.hidde
 let trendOffset=0,spendingTrends=false,activityTrends=false;
 let view='today',product={brand:'Zyn',mg:6},notice='',entries=[],purchases=[];
 let customOptions={brands:[],strengths:[]};
+let tapering=PouchTaper.read(),pouchDraft=null,pendingPouch=null,skipCravingPrompt=false;
+let sudokuGame=null,cravingDeadline=0,cravingMinutes=5,cravingTimer=null,sudokuMessage='',sudokuConflicts=[];
 const localDate=d=>`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
 let lastAdded=null,pouchFormOpen=false,feedbackTimer=null;
 const activityOptions=['Working at kiosk','Concentrating on computer','At comedy','At a movie','At home','After eating','Traveling','Taking a break','Socializing','After waking up','Other'];
@@ -31,10 +33,11 @@ function entryPicker(name,label,options,value,suffix=""){
     </div>`;
 }
 function pouchEntryMarkup(){
+  const draft=pouchDraft||product;
   const fields=pouchFormOpen?`<form data-kind="pouch" class="pouch-form">
-    <div class="pouch-product-fields"><div>${entryPicker('brand','Brand',brandValues().map(value=>({value,label:value})),product.brand)}</div>
-    <div>${entryPicker('mg','Nicotine per pouch',strengthValues().map(mg=>({value:String(mg),label:`${mg} mg`})),product.mg)}</div></div>
-    ${entryPicker('activity','What are you doing? (optional)',['',...activityOptions].map(value=>({value,label:value||'Not specified'})),'')}
+    <div class="pouch-product-fields"><div>${entryPicker('brand','Brand',brandValues().map(value=>({value,label:value})),draft.brand)}</div>
+    <div>${entryPicker('mg','Nicotine per pouch',strengthValues().map(mg=>({value:String(mg),label:`${mg} mg`})),draft.mg)}</div></div>
+    ${entryPicker('activity','What are you doing? (optional)',['',...activityOptions].map(value=>({value,label:value||'Not specified'})),pouchDraft?.activity||'')}
     <div class="form-actions"><button type="submit" class="primary">Save</button><button type="button" data-action="cancel-pouch">Cancel</button></div>
   </form>`:'';
   return `<section class="pouch-entry" aria-labelledby="pouch-entry-title"><div class="row pouch-entry-heading"><h2 id="pouch-entry-title">Add pouch</h2>
@@ -111,7 +114,7 @@ root.addEventListener('keydown',event=>{
   }
 });
 function closePouchEntry(){
-  pouchFormOpen=false;clearTimeout(feedbackTimer);notice='';render();
+  pouchFormOpen=false;pouchDraft=null;pendingPouch=null;skipCravingPrompt=false;clearTimeout(feedbackTimer);notice='';render();
   content.querySelector('[data-action="open-pouch"]')?.focus({preventScroll:true});
 }
 function schedulePouchFeedbackDismissal(){
@@ -127,17 +130,28 @@ function addPouchFromForm(form){
   if(!pouchFormOpen)return;
   const data=new FormData(form),brand=data.get('brand'),mg=Number(data.get('mg')),activity=data.get('activity');
   if(!brandValues().includes(brand)||!strengthValues().includes(mg)||(activity&&!activityOptions.includes(activity)))return;
+  const draft={brand,mg,activity:activity||''},today=entries.filter(e=>e.type==='pouch'&&e.date===localDate(new Date()));
+  const plan=PouchTaper.plan(entries,tapering);
+  if(!skipCravingPrompt&&PouchTaper.exceeds(plan,today.length,today.reduce((sum,e)=>sum+e.mg,0),mg)){
+    pendingPouch=draft;pouchDraft=draft;
+    const dialog=root.querySelector('#craving-prompt');
+    dialog.querySelector('#craving-prompt-detail').textContent='This entry would put you above your daily guide of '+plan.countTarget+' pouches or '+formatAmount(plan.nicotineTarget)+' mg.';
+    dialog.showModal();return;
+  }
+  commitPouch(draft);
+}
+function commitPouch(draft){
   let id=Date.now();while(findEntry(id))id++;
-  const entry={id,type:'pouch',brand,mg,date:localDate(new Date()),time:time()};
-  if(activity)entry.activity=activity;
+  const entry={id,type:'pouch',brand:draft.brand,mg:draft.mg,date:localDate(new Date()),time:time()};
+  if(draft.activity)entry.activity=draft.activity;
   entries.unshift(entry);
-  if(!persist()){entries=entries.filter(item=>item.id!==id);return;}
-  lastAdded=id;pouchFormOpen=false;notice='Pouch added';render();
-  content.focus({preventScroll:true});schedulePouchFeedbackDismissal();
+  if(!persist()){entries=entries.filter(item=>item.id!==id);return false;}
+  lastAdded=id;pouchFormOpen=false;pouchDraft=null;pendingPouch=null;skipCravingPrompt=false;notice='Pouch added';render();
+  content.focus({preventScroll:true});schedulePouchFeedbackDismissal();return true;
 }
 
-try{const saved=JSON.parse(localStorage.getItem('pouch-tracker-v1'));if(saved){product=saved.product;entries=saved.entries;purchases=saved.purchases;customOptions=readCustomOptions(saved.options)}}catch{}
-const persist=()=>{try{localStorage.setItem('pouch-tracker-v1',JSON.stringify({version:1,product,entries,purchases,options:customOptions}));return true}catch{alert('Could not save. Please export your data before closing the app.');return false}};
+try{const saved=JSON.parse(localStorage.getItem('pouch-tracker-v1'));if(saved){product=saved.product;entries=saved.entries;purchases=saved.purchases;customOptions=readCustomOptions(saved.options);tapering=PouchTaper.read(saved.tapering)}}catch{}
+const persist=()=>{try{localStorage.setItem('pouch-tracker-v1',JSON.stringify({version:1,product,entries,purchases,options:customOptions,tapering}));return true}catch{alert('Could not save. Please export your data before closing the app.');return false}};
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const money=n=>'$'+n.toFixed(2),time=()=>new Date().toLocaleTimeString([], {hour:'numeric',minute:'2-digit'});
 const items=()=>[...entries,...purchases].sort((a,b)=>b.id-a.id);
@@ -167,7 +181,7 @@ function strengthValues(){
 }
 function validBackup(data){
   if(!data||data.version!==1||!validBrand(data.product?.brand)||!validStrength(data.product?.mg)||!Array.isArray(data.entries)||!Array.isArray(data.purchases))return false;
-  try{readCustomOptions(data.options)}catch{return false}
+  try{readCustomOptions(data.options);PouchTaper.read(data.tapering)}catch{return false}
   const common=entry=>entry&&validBrand(entry.brand)&&validOptionalNote(entry)&&validOptionalActivity(entry)&&Number.isFinite(entry.id)&&/^\d{4}-\d{2}-\d{2}$/.test(entry.date)&&typeof entry.time==='string';
   return data.entries.every(entry=>common(entry)&&entry.type==='pouch'&&validStrength(entry.mg))&&data.purchases.every(entry=>common(entry)&&entry.type==='purchase'&&Number.isInteger(entry.tins)&&entry.tins>0&&Number.isFinite(entry.amount)&&entry.amount>=0);
 }
@@ -278,16 +292,114 @@ function scrollToResourceSection(link){
 }
 
 function render(){
+clearInterval(cravingTimer);cravingTimer=null;
 content.classList.toggle('trends-layout',view==='trends');
 root.querySelectorAll('nav button').forEach(b=>b.dataset.view===view?b.setAttribute('aria-current','page'):b.removeAttribute('aria-current'));
+if(view==='craving'){content.innerHTML=cravingMarkup();updateCravingTimer();cravingTimer=setInterval(updateCravingTimer,1000);return;}
 if(view==='today'&&pouchFormOpen){content.innerHTML=pouchEntryMarkup();return;}
 const today=localDate(new Date()),week=new Date();week.setHours(0,0,0,0);week.setDate(week.getDate()-((week.getDay()+6)%7));const weekKey=localDate(week),month=today.slice(0,7);let total=entries.filter(e=>e.type==='pouch'&&e.date===today),spent=purchases.filter(p=>p.date>=weekKey&&p.date<=today).reduce((s,p)=>s+p.amount,0),monthSpent=purchases.filter(p=>p.date.startsWith(month)&&p.date<=today).reduce((s,p)=>s+p.amount,0);
-if(view==='today')content.innerHTML=`${pouchEntryMarkup()}<h3>Summary</h3><div class="totals"><div><div class="value">${total.length}</div><div class="caption">Pouches</div></div><div><div class="value">${total.reduce((s,e)=>s+e.mg,0)} <small>mg</small></div><div class="caption">Nicotine</div></div></div><section class="purchase-section" aria-labelledby="purchase-title"><div class="row pouch-entry-heading"><h2 id="purchase-title">Add purchase</h2><button type="button" class="add-entry-icon" data-action="purchase" aria-label="Add purchase entry">${addEntryIcon}</button></div><h3>Spending</h3><div class="totals spending-totals"><div><div class="value">${money(spent)}</div><div class="caption">Week</div></div><div><div class="value">${money(monthSpent)}</div><div class="caption">Month</div></div></div></section><details class="recent"><summary>Recent entries <svg class="chevron" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></summary>${rows(entries.filter(e=>e.date===today).slice(0,3),false,true)}</details>`;
+if(view==='today')content.innerHTML=`${pouchEntryMarkup()}<h3>Summary</h3>${todayTotals(total)}<section class="purchase-section" aria-labelledby="purchase-title"><div class="row pouch-entry-heading"><h2 id="purchase-title">Add purchase</h2><button type="button" class="add-entry-icon" data-action="purchase" aria-label="Add purchase entry">${addEntryIcon}</button></div><h3>Spending</h3><div class="totals spending-totals"><div><div class="value">${money(spent)}</div><div class="caption">Week</div></div><div><div class="value">${money(monthSpent)}</div><div class="caption">Month</div></div></div></section><details class="recent"><summary>Recent entries <svg class="chevron" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></summary>${rows(entries.filter(e=>e.date===today).slice(0,3),false,true)}</details>`;
 if(view==='history')content.innerHTML=`<h2 class="page-heading">History</h2>${weeklyHistory()}`;
 if(view==='trends')content.innerHTML=trendsMarkup(monthSpent);
 if(view==='resources')content.innerHTML=window.pouchResources;
-if(view==='settings')content.innerHTML=`<h2 class="page-heading">Settings</h2><section class="settings-section" aria-labelledby="default-product-title"><h3 id="default-product-title">Default product</h3><div class="row"><span>${esc(product.brand)}, ${product.mg} mg</span><button class="link" data-action="product">Change</button></div></section><section class="settings-section" aria-labelledby="product-options-title"><h3 id="product-options-title">Brands and strengths</h3><div class="entry-actions"><button class="link" data-action="brand-option">Add brand</button><button class="link" data-action="strength-option">Add strength</button></div><p class="caption" id="product-options-status" role="status" aria-live="polite"></p></section><section class="settings-section" aria-labelledby="your-data-title"><h3 id="your-data-title">Your data</h3><p class="caption entry-note">Logs are saved on this device. Export a backup before clearing browser data or switching phones.</p><div class="entry-actions"><button class="link" data-action="export">Export backup</button><button class="link" data-action="restore">Restore backup</button></div><input type="file" id="backup-file" accept="application/json,.json" hidden></section><section class="settings-section" aria-labelledby="app-updates-title"><h3 id="app-updates-title">App updates</h3><div class="caption">Check for the latest app files and reload. Your saved logs and settings stay on this device.</div><div class="form-actions"><button class="primary" data-action="update">Update app</button></div><p id="update-status" role="status" aria-live="polite"></p></section>`;
+if(view==='settings')content.innerHTML=`<h2 class="page-heading">Settings</h2><section class="settings-section" aria-labelledby="default-product-title"><h3 id="default-product-title">Default product</h3><div class="row"><span>${esc(product.brand)}, ${product.mg} mg</span><button class="link" data-action="product">Change</button></div></section>${taperingSettings()}<section class="settings-section" aria-labelledby="product-options-title"><h3 id="product-options-title">Brands and strengths</h3><div class="entry-actions"><button class="link" data-action="brand-option">Add brand</button><button class="link" data-action="strength-option">Add strength</button></div><p class="caption" id="product-options-status" role="status" aria-live="polite"></p></section><section class="settings-section" aria-labelledby="your-data-title"><h3 id="your-data-title">Your data</h3><p class="caption entry-note">Logs are saved on this device. Export a backup before clearing browser data or switching phones.</p><div class="entry-actions"><button class="link" data-action="export">Export backup</button><button class="link" data-action="restore">Restore backup</button></div><input type="file" id="backup-file" accept="application/json,.json" hidden></section><section class="settings-section" aria-labelledby="app-updates-title"><h3 id="app-updates-title">App updates</h3><div class="caption">Check for the latest app files and reload. Your saved logs and settings stay on this device.</div><div class="form-actions"><button class="primary" data-action="update">Update app</button></div><p id="update-status" role="status" aria-live="polite"></p></section>`;
 }
+
+function formatAmount(value){return Number(value.toFixed(2)).toString();}
+function todayTotals(today){
+  const count=today.length,nicotine=today.reduce((sum,e)=>sum+e.mg,0),plan=PouchTaper.plan(entries,tapering);
+  if(!plan.active)return '<div class="totals"><div><div class="value">'+count+'</div><div class="caption">Pouches</div></div><div><div class="value">'+nicotine+' <small>mg</small></div><div class="caption">Nicotine</div></div></div>'+(tapering.enabled?'<p class="caption">No pouch logs from last week to set a target yet.</p>':'');
+  const pouches=plan.countTarget-count,mg=Math.round((plan.nicotineTarget-nicotine)*100)/100;
+  return '<div class="totals"><div><div class="value">'+Math.abs(pouches)+'</div><div class="caption">'+(pouches<0?'Pouches over target':'Pouches remaining')+'</div></div><div><div class="value">'+formatAmount(Math.abs(mg))+' <small>mg</small></div><div class="caption">'+(mg<0?'Nicotine over target':'Nicotine remaining')+'</div></div></div>';
+}
+function taperingSettings(){
+  const plan=PouchTaper.plan(entries,tapering);
+  const baseline=plan.days?'Last week: '+plan.start+' – '+plan.end+'. Daily average: '+formatAmount(plan.countAverage)+' pouches / '+formatAmount(plan.nicotineAverage)+' mg, from '+plan.days+' of 7 days with logs.':'No pouch logs from the previous Monday–Sunday week yet.';
+  return '<section class="settings-section" aria-labelledby="taper-title"><h3 id="taper-title">Tapering</h3><label class="taper-switch" for="taper-enabled"><span>Enable tapering</span><input id="taper-enabled" type="checkbox" role="switch" '+(tapering.enabled?'checked':'')+'></label><div id="taper-options" '+(tapering.enabled?'':'hidden')+'><label for="taper-percent">Reduction (%)</label><input id="taper-percent" type="number" min="0" max="100" step="0.1" inputmode="decimal" value="'+tapering.percent+'" aria-describedby="taper-baseline taper-status"><p class="caption" id="taper-baseline">'+baseline+'</p><p class="caption" id="taper-target">'+(plan.active?'Daily guide: '+plan.countTarget+' pouches / '+formatAmount(plan.nicotineTarget)+' mg.':'')+'</p></div><p class="caption setting-status" id="taper-status" role="status" aria-live="polite"></p></section>';
+}
+function saveTaperingControl(input){
+  const enabled=root.querySelector('#taper-enabled'),percent=root.querySelector('#taper-percent'),status=root.querySelector('#taper-status');
+  if(input===percent&&(percent.value.trim()===''||!Number.isFinite(Number(percent.value))||Number(percent.value)<0||Number(percent.value)>100)){
+    percent.setAttribute('aria-invalid','true');status.textContent='Enter a percentage from 0 to 100.';return;
+  }
+  const previous=tapering,next={enabled:enabled.checked,percent:input===percent?Number(percent.value):previous.percent};
+  tapering=next;
+  if(!persist()){tapering=previous;enabled.checked=previous.enabled;percent.value=previous.percent;status.textContent='Not saved. Try again.';return;}
+  if(input===enabled)percent.value=String(next.percent);
+  percent.removeAttribute('aria-invalid');root.querySelector('#taper-options').hidden=!next.enabled;
+  const plan=PouchTaper.plan(entries,next);
+  root.querySelector('#taper-target').textContent=plan.active?'Daily guide: '+plan.countTarget+' pouches / '+formatAmount(plan.nicotineTarget)+' mg.':'';
+  status.textContent='Saved.';
+}
+root.addEventListener('change',e=>{if(e.target.id==='taper-enabled')saveTaperingControl(e.target)});
+root.addEventListener('input',e=>{if(e.target.id==='taper-percent')saveTaperingControl(e.target)});
+function ensureSudoku(){
+  if(!sudokuGame){sudokuGame=PouchSudoku.make();cravingDeadline=Date.now()+cravingMinutes*60000;}
+}
+function updateCravingTimer(){
+  if(view!=='craving')return;
+  const timer=content.querySelector('#craving-timer');if(!timer)return;
+  const seconds=Math.max(0,Math.ceil((cravingDeadline-Date.now())/1000));
+  timer.textContent=Math.floor(seconds/60)+':'+String(seconds%60).padStart(2,'0');
+  const status=content.querySelector('#craving-delay-status');
+  const message=seconds?'Time remaining in your break':'Your break is complete. You can keep playing or return.';
+  if(status&&status.textContent!==message)status.textContent=message;
+}
+function cravingMarkup(){
+  ensureSudoku();
+  const selected=sudokuGame.selected;
+  return '<h2 class="page-heading">Fight the craving</h2><p class="caption">Take a Sudoku break. You can return and log at any time.</p><div class="craving-break"><div class="craving-duration" role="group" aria-label="Break duration"><button type="button" data-craving-minutes="5" aria-pressed="'+(cravingMinutes===5)+'">5 min</button><button type="button" data-craving-minutes="10" aria-pressed="'+(cravingMinutes===10)+'">10 min</button></div><span id="craving-timer" class="craving-clock" role="timer" aria-label="Break time remaining"></span></div><p class="caption" id="craving-delay-status" aria-live="polite"></p><h3>Sudoku</h3><p class="caption">Fill each row, column and 3×3 box with 1–9, without repeats.</p><div class="sudoku-grid" role="grid" aria-label="Sudoku puzzle">'+Array.from({length:9},(_,r)=>'<div class="sudoku-row" role="row">'+Array.from({length:9},(_,c)=>{const i=r*9+c,n=sudokuGame.values[i],given=!!sudokuGame.givens[i];return '<div role="gridcell" aria-selected="'+(selected===i)+'"><button type="button" class="sudoku-cell'+(given?' given':'')+(selected===i?' selected':'')+(sudokuConflicts.includes(i)?' conflict':'')+'" data-sudoku-cell="'+i+'" tabindex="'+(selected===i?'0':'-1')+'" aria-label="Row '+(r+1)+', column '+(c+1)+', '+(n||'empty')+(given?', given':'')+'" aria-disabled="'+given+'">'+(n||'')+'</button></div>'}).join('')+'</div>').join('')+'</div><div class="sudoku-keypad" role="group" aria-label="Enter a number">'+Array.from({length:9},(_,i)=>'<button type="button" data-sudoku-number="'+(i+1)+'" '+(sudokuGame.givens[selected]?'disabled':'')+'>'+(i+1)+'</button>').join('')+'</div><div class="entry-actions"><button type="button" class="link" data-sudoku-action="erase">Erase</button><button type="button" class="link" data-sudoku-action="check">Check</button><button type="button" class="link" data-sudoku-action="new">New puzzle</button></div><p class="caption setting-status" role="status" id="sudoku-status">'+esc(sudokuMessage)+'</p><div class="form-actions"><button type="button" class="primary" data-action="leave-craving">'+(pouchDraft?'Return to pouch':'Back to Today')+'</button></div>';
+}
+function refreshSudoku(focus=true){
+  render();if(focus)content.querySelector('[data-sudoku-cell="'+sudokuGame.selected+'"]')?.focus({preventScroll:true});
+}
+function putSudoku(value){
+  if(!sudokuGame||!PouchSudoku.put(sudokuGame,sudokuGame.selected,value))return;
+  sudokuConflicts=[];sudokuMessage=PouchSudoku.solved(sudokuGame)?'Puzzle complete. Well done.':'';refreshSudoku();
+}
+function handleCravingClick(event){
+  const b=event.target.closest('button');if(!b)return false;
+  const action=b.dataset.action;
+  if(action==='prompt-cancel'){root.querySelector('#craving-prompt').close();pendingPouch=null;return true;}
+  if(action==='prompt-log'){
+    root.querySelector('#craving-prompt').close();if(pendingPouch)commitPouch(pendingPouch);return true;
+  }
+  if(action==='prompt-sudoku'){
+    root.querySelector('#craving-prompt').close();skipCravingPrompt=true;view='craving';pouchFormOpen=false;notice='';
+    ensureSudoku();cravingDeadline=Date.now()+cravingMinutes*60000;render();content.focus({preventScroll:true});window.scrollTo({top:0,behavior:'instant'});return true;
+  }
+  if(action==='leave-craving'){
+    view='today';pouchFormOpen=!!pouchDraft;render();content.focus({preventScroll:true});window.scrollTo({top:0,behavior:'instant'});return true;
+  }
+  if(b.dataset.sudokuCell!==undefined){sudokuGame.selected=Number(b.dataset.sudokuCell);sudokuMessage='';refreshSudoku();return true;}
+  if(b.dataset.sudokuNumber!==undefined){putSudoku(Number(b.dataset.sudokuNumber));return true;}
+  if(b.dataset.cravingMinutes){cravingMinutes=Number(b.dataset.cravingMinutes);cravingDeadline=Date.now()+cravingMinutes*60000;refreshSudoku(false);return true;}
+  if(b.dataset.sudokuAction){
+    if(b.dataset.sudokuAction==='erase')putSudoku(0);
+    if(b.dataset.sudokuAction==='new'){sudokuGame=PouchSudoku.make();sudokuMessage='';sudokuConflicts=[];cravingDeadline=Date.now()+cravingMinutes*60000;refreshSudoku();}
+    if(b.dataset.sudokuAction==='check'){
+      sudokuConflicts=PouchSudoku.conflicts(sudokuGame.values);
+      sudokuMessage=PouchSudoku.solved(sudokuGame)?'Puzzle complete. Well done.':sudokuConflicts.length?sudokuConflicts.length+' cells repeat a number in a row, column or box.':'No conflicts so far. '+sudokuGame.values.filter(n=>!n).length+' cells left.';
+      refreshSudoku(false);
+    }return true;
+  }
+  return false;
+}
+root.addEventListener('keydown',event=>{
+  const cell=event.target.closest('[data-sudoku-cell]');if(!cell||!sudokuGame)return;
+  if(/^[1-9]$/.test(event.key)){event.preventDefault();putSudoku(Number(event.key));return;}
+  if(['Backspace','Delete','0'].includes(event.key)){event.preventDefault();putSudoku(0);return;}
+  const index=Number(cell.dataset.sudokuCell),row=Math.floor(index/9),col=index%9;
+  let next=index;
+  if(event.key==='ArrowRight')next=row*9+Math.min(8,col+1);
+  if(event.key==='ArrowLeft')next=row*9+Math.max(0,col-1);
+  if(event.key==='ArrowDown')next=Math.min(8,row+1)*9+col;
+  if(event.key==='ArrowUp')next=Math.max(0,row-1)*9+col;
+  if(event.key==='Home')next=row*9;
+  if(event.key==='End')next=row*9+8;
+  if(next!==index){event.preventDefault();sudokuGame.selected=next;refreshSudoku();}
+});
+
 function trendModeIcon(spending){
   return `<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">${spending?'<rect x="3" y="3" width="18" height="18" rx="2"/><path d="M12 5v14m4-11c-1-2-8-2-8 1 0 4 8 2 8 6 0 3-7 3-8 1"/>':'<rect x="6" y="3" width="12" height="18" rx="5"/><path d="M8 10h8"/>'}</svg>`;
 }
@@ -379,7 +491,7 @@ try{
   location.reload();
 }catch(error){status.textContent=error.message||'Could not update. Check your connection and try again.';button.disabled=false;}
 }
-root.addEventListener('click',e=>{const slice=e.target.closest('[data-activity-slice]');if(slice){selectActivitySlice(slice);return;}const articleLink=e.target.closest('.resource-contents a[href^="#"]');if(articleLink){e.preventDefault();scrollToResourceSection(articleLink);return;}const b=e.target.closest('button, .brand');if(!b)return;if(b.dataset.day!==undefined){const shown=b.getAttribute('aria-pressed')==='true';content.querySelectorAll('.trend-day').forEach(day=>{day.setAttribute('aria-pressed','false');day.querySelector('.bar-nicotine').hidden=true;});if(!shown){b.setAttribute('aria-pressed','true');b.querySelector('.bar-nicotine').hidden=false;}return;}if(b.dataset.trend){trendOffset=Math.max(0,trendOffset+(b.dataset.trend==='previous'?1:-1));render();return;}if(b.dataset.edit){editRecord(b,true);return;}if(b.dataset.editCancel){editRecord(b,false);return;}if(b.dataset.view){e.preventDefault();setMenuOpen(false);view=b.dataset.view;notice='';pouchFormOpen=false;clearTimeout(feedbackTimer);render();content.focus({preventScroll:true});window.scrollTo({top:0,behavior:'instant'});return}if(b.dataset.delete){const id=Number(b.dataset.delete);entries=entries.filter(x=>x.id!==id);purchases=purchases.filter(x=>x.id!==id);persist();notice='';render();return}const a=b.dataset.action;if(a==='activities'||a==='close-activities'){activityTrends=a==='activities';render();content.focus({preventScroll:true});window.scrollTo({top:0,behavior:'instant'});return;}if(a==='toggle-trends'){spendingTrends=!spendingTrends;trendOffset=0;render();return;}if(a==='update'){updateApp(b);return}if(a==='open-pouch'){if(pouchFormOpen){closePouchEntry();return;}pouchFormOpen=true;notice='';clearTimeout(feedbackTimer);render();content.querySelector('[data-action="open-pouch"]').focus({preventScroll:true});}else if(a==='cancel-pouch'){closePouchEntry();}else if(a==='undo'){const previous=entries;entries=entries.filter(e=>e.id!==lastAdded);if(!persist()){entries=previous;return;}closePouchEntry();}else if(a==='export'){const blob=new Blob([JSON.stringify({version:1,product,entries,purchases,options:customOptions},null,2)],{type:'application/json'});const url=URL.createObjectURL(blob),link=document.createElement('a');link.href=url;link.download='pouch-tracker-backup.json';link.click();setTimeout(()=>URL.revokeObjectURL(url),1000)}else if(a==='restore'){root.querySelector('#backup-file').click()}else if(a==='cancel')render();else if(a)form(a)});
+root.addEventListener('click',e=>{if(handleCravingClick(e))return;const slice=e.target.closest('[data-activity-slice]');if(slice){selectActivitySlice(slice);return;}const articleLink=e.target.closest('.resource-contents a[href^="#"]');if(articleLink){e.preventDefault();scrollToResourceSection(articleLink);return;}const b=e.target.closest('button, .brand');if(!b)return;if(b.dataset.day!==undefined){const shown=b.getAttribute('aria-pressed')==='true';content.querySelectorAll('.trend-day').forEach(day=>{day.setAttribute('aria-pressed','false');day.querySelector('.bar-nicotine').hidden=true;});if(!shown){b.setAttribute('aria-pressed','true');b.querySelector('.bar-nicotine').hidden=false;}return;}if(b.dataset.trend){trendOffset=Math.max(0,trendOffset+(b.dataset.trend==='previous'?1:-1));render();return;}if(b.dataset.edit){editRecord(b,true);return;}if(b.dataset.editCancel){editRecord(b,false);return;}if(b.dataset.view){e.preventDefault();setMenuOpen(false);view=b.dataset.view;notice='';pouchFormOpen=false;pouchDraft=null;pendingPouch=null;skipCravingPrompt=false;if(view==='craving')ensureSudoku();clearTimeout(feedbackTimer);render();content.focus({preventScroll:true});window.scrollTo({top:0,behavior:'instant'});return}if(b.dataset.delete){const id=Number(b.dataset.delete);entries=entries.filter(x=>x.id!==id);purchases=purchases.filter(x=>x.id!==id);persist();notice='';render();return}const a=b.dataset.action;if(a==='activities'||a==='close-activities'){activityTrends=a==='activities';render();content.focus({preventScroll:true});window.scrollTo({top:0,behavior:'instant'});return;}if(a==='toggle-trends'){spendingTrends=!spendingTrends;trendOffset=0;render();return;}if(a==='update'){updateApp(b);return}if(a==='open-pouch'){if(pouchFormOpen){closePouchEntry();return;}pouchFormOpen=true;notice='';clearTimeout(feedbackTimer);render();content.querySelector('[data-action="open-pouch"]').focus({preventScroll:true});}else if(a==='cancel-pouch'){closePouchEntry();}else if(a==='undo'){const previous=entries;entries=entries.filter(e=>e.id!==lastAdded);if(!persist()){entries=previous;return;}closePouchEntry();}else if(a==='export'){const blob=new Blob([JSON.stringify({version:1,product,entries,purchases,options:customOptions,tapering},null,2)],{type:'application/json'});const url=URL.createObjectURL(blob),link=document.createElement('a');link.href=url;link.download='pouch-tracker-backup.json';link.click();setTimeout(()=>URL.revokeObjectURL(url),1000)}else if(a==='restore'){root.querySelector('#backup-file').click()}else if(a==='cancel')render();else if(a)form(a)});
 root.addEventListener('input',e=>{if(e.target.matches('[name="value"],.record-form textarea'))e.target.setCustomValidity('')});
 root.addEventListener('submit',e=>{e.preventDefault();const f=e.target,d=new FormData(f),kind=f.dataset.kind;if(kind==='brand-option'||kind==='strength-option'){saveCustomOption(f,kind,d);return;}if(kind==='pouch'){addPouchFromForm(f);return;}if(kind==='record'){saveRecord(f);return;}const previousProduct=product,previousPurchases=[...purchases];if(kind==='product'){const brand=d.get('brand'),mg=Number(d.get('mg'));if(!brandValues().includes(brand)||!strengthValues().includes(mg))return;product={brand,mg};}else if(kind==='craving')entries.unshift({id:Date.now(),type:kind,intensity:Number(d.get('intensity')),replacement:d.get('replacement'),time:time()});else purchases.unshift({id:Date.now(),type:kind,brand:d.get('brand'),tins:Number(d.get('tins')),amount:Number(d.get('amount')),date:d.get('date'),time:d.get('date')});if(!persist()){product=previousProduct;purchases=previousPurchases;return;}render()});
 root.addEventListener('change',async e=>{
@@ -388,9 +500,9 @@ root.addEventListener('change',async e=>{
   try{backup=JSON.parse(await e.target.files[0].text());if(!validBackup(backup))throw Error();}
   catch{alert('This is not a valid Pouch Tracker backup.');e.target.value='';return;}
   if(!confirm('Replace device logs with this backup?')){e.target.value='';return;}
-  const previous={product,entries,purchases,customOptions};
-  product=backup.product;entries=backup.entries;purchases=backup.purchases;customOptions=readCustomOptions(backup.options);
-  if(!persist()){({product,entries,purchases,customOptions}=previous);e.target.value='';return;}
+  const previous={product,entries,purchases,customOptions,tapering};
+  product=backup.product;entries=backup.entries;purchases=backup.purchases;customOptions=readCustomOptions(backup.options);tapering=PouchTaper.read(backup.tapering);
+  if(!persist()){({product,entries,purchases,customOptions,tapering}=previous);e.target.value='';return;}
   render();alert('Backup restored.');
 });
 
