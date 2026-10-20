@@ -155,3 +155,7 @@ Activities uses a full pie with a pouch-count caption above it, replacing the do
 ## Activity total figure caption, 2026-10-19
 
 Keep Pouches by activity unmodified. Show the total as a small semantic figcaption beside the pie (47 pouches), replacing the separate caption above it. Chart and caption shrink within mobile gutters.
+
+## Activity total and slice selection, 2026-10-19
+
+Center the pie without a side caption. Place TOTAL and the pouch count below the legend. Tapping a slice bolds its matching legend row; tapping again clears selection. SVG slice groups are named keyboard buttons with Enter/Space, visible focus and pressed state; selection resets across periods.
