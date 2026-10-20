@@ -135,3 +135,7 @@ Use commas between brand and strength or tin count in History, Today’s Recent 
 ## Purchase tin reveal, 2026-10-19
 
 Spending chart columns reuse the nicotine chart’s accessible tap toggle to reveal summed tins bought on that date, with singular/plural labels. Multiple purchases on one date are combined for display only. Missing-purchase days remain disabled.
+
+## Font loading, 2026-10-19
+
+Preload both self-hosted TTF fonts from the document head with matching font MIME type and anonymous crossorigin mode. Serve these two font paths cache-first from the current service-worker cache; fetch and populate it only on a miss. Explicit reload requests still bypass this shortcut. Other app assets keep their existing network-first update behavior. Keep font-display swap and immediately readable text. Verify Update app and reopening on iPhone for perceived flash reduction.
