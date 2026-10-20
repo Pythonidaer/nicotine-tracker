@@ -139,3 +139,7 @@ Spending chart columns reuse the nicotine chart’s accessible tap toggle to rev
 ## Font loading, 2026-10-19
 
 Preload both self-hosted TTF fonts from the document head with matching font MIME type and anonymous crossorigin mode. Serve these two font paths cache-first from the current service-worker cache; fetch and populate it only on a miss. Explicit reload requests still bypass this shortcut. Other app assets keep their existing network-first update behavior. Keep font-display swap and immediately readable text. Verify Update app and reopening on iPhone for perceived flash reduction.
+
+## Weekly Activities trends, 2026-10-19
+
+Nicotine and spending views link to Activities at bottom right with a tag SVG. Activities retains the selected seven-day window and returns to the originating mode. Navigation uses pouch-record bounds. Donut slices count pouches equally, ignoring strength; missing/blank activities are Not specified. A text legend provides every activity, rounded percentage and count, independent of color. The center shows total pouches; empty periods show an empty state. Activity colors stay stable for standard choices across weeks. No data schema changes.
