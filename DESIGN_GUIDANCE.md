@@ -163,3 +163,7 @@ Center the pie without a side caption. Place TOTAL and the pouch count below the
 ## Activity selection color, 2026-10-19
 
 Selected legend rows use the same accent green as resource section headings, replacing bold. Keep SVG pressed state and keyboard support. Activities are already serialized on entries in version-1 exports and validated/preserved on restore; older records may omit activity.
+
+## Safari slice tap feedback, 2026-10-19
+
+Disable WebKit’s default tap-highlight color specifically on interactive pie slice groups, preventing a rectangular translucent overlay. Retain the selected legend color, pressed state and explicit focus-visible stroke for keyboard users. Actual iOS confirmation remains required.
