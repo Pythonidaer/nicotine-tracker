@@ -159,3 +159,7 @@ Keep Pouches by activity unmodified. Show the total as a small semantic figcapti
 ## Activity total and slice selection, 2026-10-19
 
 Center the pie without a side caption. Place TOTAL and the pouch count below the legend. Tapping a slice bolds its matching legend row; tapping again clears selection. SVG slice groups are named keyboard buttons with Enter/Space, visible focus and pressed state; selection resets across periods.
+
+## Activity selection color, 2026-10-19
+
+Selected legend rows use the same accent green as resource section headings, replacing bold. Keep SVG pressed state and keyboard support. Activities are already serialized on entries in version-1 exports and validated/preserved on restore; older records may omit activity.

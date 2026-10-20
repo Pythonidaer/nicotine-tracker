@@ -240,6 +240,6 @@ body { margin: 0; background: var(--p-bg); color: var(--p-fg); }
 
 #pouch-preview .activity-total { padding: 12px 0; font-weight: 700; }
 
-#pouch-preview .activity-legend li.selected { font-weight: 700; }
+#pouch-preview .activity-legend li.selected { color: var(--p-accent); }
 #pouch-preview .activity-slice { cursor: pointer; }
 #pouch-preview .activity-slice:focus-visible { outline: none; stroke: var(--p-fg); stroke-width: 2px; }
