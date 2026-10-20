@@ -226,9 +226,7 @@ body { margin: 0; background: var(--p-bg); color: var(--p-fg); }
 #pouch-preview .trend-view-link { display: flex; justify-content: flex-end; margin-top: 16px; }
 #pouch-preview .trend-view-link button { display: inline-flex; align-items: center; gap: 8px; }
 #pouch-preview .activity-chart { display: flex; justify-content: center; margin: 16px 0; }
-#pouch-preview .activity-donut { width: 220px; max-width: 100%; height: auto; }
-#pouch-preview .donut-count { fill: var(--p-fg); font: 400 32px var(--p-heading); }
-#pouch-preview .donut-label { fill: var(--p-muted); font: 12px var(--p-body); }
+#pouch-preview .activity-pie { width: 220px; max-width: 100%; height: auto; }
 #pouch-preview .activity-legend { list-style: none; padding: 0; margin: 0; }
 #pouch-preview .activity-legend li { display: grid; grid-template-columns: 10px minmax(0,1fr) auto; gap: 10px; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--p-line); }
 #pouch-preview .activity-swatch { width: 10px; height: 10px; border-radius: 2px; }

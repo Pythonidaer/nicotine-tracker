@@ -147,3 +147,7 @@ Nicotine and spending views link to Activities at bottom right with a tag SVG. A
 ## Bottom-aligned trend navigation, 2026-10-19
 
 Trends main content uses a growing flex column; the Activities/return link has an automatic top margin and safe-area-aware bottom gutter. It sits at bottom right on short pages and follows content on tall pages, without a fixed overlay or obscured controls.
+
+## Activity pie and labelled return icons, 2026-10-19
+
+Activities uses a full pie with a pouch-count caption above it, replacing the donut and center labels. Keep legend percentages/counts and the accessible chart name. A single category renders a full circle. Return links pair Spending trends with the same money SVG and Nicotine trends with the same pouch SVG used by the mode toggle.
