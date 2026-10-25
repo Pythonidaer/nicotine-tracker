@@ -14,16 +14,20 @@
 }
 :root {
   color-scheme: light dark;
-  --p-bg: light-dark(#fafaf8, #191a19);
-  --p-fg: light-dark(#252b28, #e9ede9);
-  --p-muted: light-dark(#626a65, #aab4ad);
-  --p-line: light-dark(#dedfd9, #383d39);
-  --p-accent: light-dark(#365947, #a4c9b0);
-  --p-on: light-dark(#fff, #17251b);
+  --p-bg: light-dark(#fafaf8, #191b1e);
+  --p-fg: light-dark(#242b33, #e8edf2);
+  --p-muted: light-dark(#5c6773, #aab5c2);
+  --p-line: light-dark(#dce1e6, #37414c);
+  --p-accent: light-dark(#365f85, #a6c6e8);
+  --p-on: light-dark(#ffffff, #14283c);
   /* Functional roles stay independent of decorative dividers and brand accents. */
-  --p-control-border: light-dark(#626a65, #aab4ad);
-  --p-focus-ring: light-dark(#252b28, #e9ede9);
-  --p-focus-on-selected: light-dark(#fff, #17251b);
+  --p-control-border: light-dark(#687786, #91a0af);
+  --p-focus-ring: light-dark(#242b33, #e8edf2);
+  --p-focus-on-selected: light-dark(#ffffff, #14283c);
+  --p-data: light-dark(#365f85, #a6c6e8);
+  --p-progress: light-dark(#276447, #94cba9);
+  --p-attention: light-dark(#805500, #e8be68);
+  --p-error: light-dark(#a02d36, #f1a0a6);
   --p-heading: "Oswald", "Helvetica Neue", sans-serif;
   --p-body: "Merriweather", Georgia, serif;
 }
@@ -105,12 +109,12 @@ body { margin: 0; background: var(--p-bg); color: var(--p-fg); }
 }
 #pouch-preview nav button { border: 0; text-align: left; padding: 10px 12px; min-height: 44px; }
 #pouch-preview nav button[aria-current="page"] { background: var(--p-accent); color: var(--p-on); }
-#pouch-preview .notice { font-size: 13px; color: var(--p-accent); margin-top: 8px; }
+#pouch-preview .notice { font-size: 13px; color: var(--p-muted); margin-top: 8px; }
 #pouch-preview .actions, #pouch-preview .form-actions { display: flex; flex-wrap: wrap; gap: 12px; }
 #pouch-preview .form-actions { margin-top: 20px; }
 #pouch-preview .bars { display: flex; align-items: flex-end; gap: 12px; height: 145px; margin: 16px 0; }
 #pouch-preview .column { flex: 1; min-width: 0; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; height: 100%; font-size: 12px; }
-#pouch-preview .bar { width: 100%; background: var(--p-accent); border-radius: 2px; margin: 4px 0; }
+#pouch-preview .bar { width: 100%; background: var(--p-data); border-radius: 2px; margin: 4px 0; }
 #pouch-preview .empty { color: var(--p-muted); padding: 8px 0; }
 #pouch-preview .recent { border-top: 1px solid var(--p-line); margin-top: 12px; }
 #pouch-preview .recent summary { list-style: none; display: flex; align-items: center; justify-content: space-between; min-height: 44px; margin: 6px 0; padding: 4px 0; cursor: pointer; }
@@ -153,7 +157,7 @@ body { margin: 0; background: var(--p-bg); color: var(--p-fg); }
 #pouch-preview .record-form { padding-bottom: 4px; }
 #pouch-preview textarea { display: block; min-height: 144px; max-height: 320px; resize: vertical; }
 #pouch-preview .note-buttons { margin-top: 8px; }
-#pouch-preview .note-status { color: var(--p-accent); margin: 4px 0 0; font-size: 12px; }
+#pouch-preview .note-status { color: var(--p-muted); margin: 4px 0 0; font-size: 12px; }
 #pouch-preview .note-status:empty { display: none; }
 #pouch-preview .resource-page h2:focus { outline: none; }
 
@@ -161,7 +165,7 @@ body { margin: 0; background: var(--p-bg); color: var(--p-fg); }
 #pouch-preview .pouch-entry-heading h2 { margin: 0; }
 #pouch-preview .add-entry-icon { width: 44px; height: 44px; padding: 10px; display: grid; place-items: center; border: 0; color: var(--p-accent); }
 #pouch-preview .pouch-product-fields { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 12px; }
-#pouch-preview .pouch-feedback { display: flex; align-items: center; gap: 8px; color: var(--p-accent); font-size: 12px; }
+#pouch-preview .pouch-feedback { display: flex; align-items: center; gap: 8px; color: var(--p-muted); font-size: 12px; }
 @media (max-width: 340px) { #pouch-preview .pouch-product-fields { grid-template-columns: 1fr; gap: 0; } }
 
 /* Shared compact selectors for brand, strength and activity. */
@@ -316,3 +320,12 @@ body { margin: 0; background: var(--p-bg); color: var(--p-fg); }
   #pouch-preview .theme-toggle input:checked + .theme-switch-track { background: Highlight; border-color: Highlight; }
   #pouch-preview .theme-toggle input:checked + .theme-switch-track .theme-switch-thumb { background: HighlightText; }
 }
+
+/* Measurement palette: feedback roles are independent of the action blue. */
+#pouch-preview .target-attention .value,
+#pouch-preview .target-attention .caption,
+#pouch-preview #craving-prompt-title { color: var(--p-attention); }
+#pouch-preview [data-state="error"],
+#pouch-preview input[aria-invalid="true"] { color: var(--p-error); }
+#pouch-preview :is(input, select, textarea)[aria-invalid="true"],
+#pouch-preview :is(input, select, textarea):user-invalid { border-color: var(--p-error); }

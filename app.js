@@ -319,7 +319,7 @@ function todayTotals(today){
   const count=today.length,nicotine=today.reduce((sum,e)=>sum+e.mg,0),plan=PouchTaper.plan(entries,tapering);
   if(!plan.active)return '<div class="totals"><div><div class="value">'+count+'</div><div class="caption">Pouches</div></div><div><div class="value">'+nicotine+' <small>mg</small></div><div class="caption">Nicotine</div></div></div>'+(tapering.enabled?'<p class="caption">No pouch logs from last week to set a target yet.</p>':'');
   const pouches=plan.countTarget-count,mg=Math.round((plan.nicotineTarget-nicotine)*100)/100;
-  return '<div class="totals"><div><div class="value">'+Math.abs(pouches)+'</div><div class="caption">'+(pouches<0?'Pouches over target':'Pouches remaining')+'</div></div><div><div class="value">'+formatAmount(Math.abs(mg))+' <small>mg</small></div><div class="caption">'+(mg<0?'Nicotine over target':'Nicotine remaining')+'</div></div></div>';
+  return '<div class="totals"><div'+(count>=plan.countTarget*.8?' class="target-attention"':'')+'><div class="value">'+Math.abs(pouches)+'</div><div class="caption">'+(pouches<0?'Pouches over target':'Pouches remaining')+'</div></div><div'+(nicotine>=plan.nicotineTarget*.8?' class="target-attention"':'')+'><div class="value">'+formatAmount(Math.abs(mg))+' <small>mg</small></div><div class="caption">'+(mg<0?'Nicotine over target':'Nicotine remaining')+'</div></div></div>';
 }
 function taperingSettings(){
   const plan=PouchTaper.plan(entries,tapering);
@@ -329,16 +329,16 @@ function taperingSettings(){
 function saveTaperingControl(input){
   const enabled=root.querySelector('#taper-enabled'),percent=root.querySelector('#taper-percent'),status=root.querySelector('#taper-status');
   if(input===percent&&(percent.value.trim()===''||!Number.isFinite(Number(percent.value))||Number(percent.value)<0||Number(percent.value)>100)){
-    percent.setAttribute('aria-invalid','true');status.textContent='Enter a percentage from 0 to 100.';return;
+    percent.setAttribute('aria-invalid','true');status.dataset.state='error';status.textContent='Enter a percentage from 0 to 100.';return;
   }
   const previous=tapering,next={enabled:enabled.checked,percent:input===percent?Number(percent.value):previous.percent};
   tapering=next;
-  if(!persist()){tapering=previous;enabled.checked=previous.enabled;percent.value=previous.percent;status.textContent='Not saved. Try again.';return;}
+  if(!persist()){tapering=previous;enabled.checked=previous.enabled;percent.value=previous.percent;status.dataset.state='error';status.textContent='Not saved. Try again.';return;}
   if(input===enabled)percent.value=String(next.percent);
   percent.removeAttribute('aria-invalid');root.querySelector('#taper-options').hidden=!next.enabled;
   const plan=PouchTaper.plan(entries,next);
   root.querySelector('#taper-target').textContent=plan.active?'Daily guide: '+plan.countTarget+' pouches / '+formatAmount(plan.nicotineTarget)+' mg.':'';
-  status.textContent='Saved.';
+  delete status.dataset.state;status.textContent='Saved.';
 }
 root.addEventListener('change',e=>{if(e.target.id==='taper-enabled')saveTaperingControl(e.target)});
 root.addEventListener('input',e=>{if(e.target.id==='taper-percent')saveTaperingControl(e.target)});
@@ -469,7 +469,7 @@ content.innerHTML=`<h2>${kind==='brand-option'?'Add brand':kind==='strength-opti
 }
 async function updateApp(button){
 const status=root.querySelector('#update-status');
-button.disabled=true;status.textContent='Checking for updates…';
+button.disabled=true;delete status.dataset.state;status.textContent='Checking for updates…';
 try{
   if(!navigator.onLine)throw Error('You are offline. Connect to the internet and try again.');
   if('serviceWorker' in navigator){
@@ -498,7 +498,7 @@ try{
   await Promise.all(assets.map(async url=>{if(url.origin!==location.origin)return;const res=await fetch(url,{cache:'reload'});if(!res.ok)throw Error('Could not download all app files. Try again.')}));
   status.textContent='App files refreshed. Reloading…';
   location.reload();
-}catch(error){status.textContent=error.message||'Could not update. Check your connection and try again.';button.disabled=false;}
+}catch(error){status.dataset.state='error';status.textContent=error.message||'Could not update. Check your connection and try again.';button.disabled=false;}
 }
 root.addEventListener('click',e=>{if(handleCravingClick(e))return;const slice=e.target.closest('[data-activity-slice]');if(slice){selectActivitySlice(slice);return;}const articleLink=e.target.closest('.resource-contents a[href^="#"]');if(articleLink){e.preventDefault();scrollToResourceSection(articleLink);return;}const b=e.target.closest('button, .brand');if(!b)return;if(b.dataset.day!==undefined){const shown=b.getAttribute('aria-pressed')==='true';content.querySelectorAll('.trend-day').forEach(day=>{day.setAttribute('aria-pressed','false');day.querySelector('.bar-nicotine').hidden=true;});if(!shown){b.setAttribute('aria-pressed','true');b.querySelector('.bar-nicotine').hidden=false;}return;}if(b.dataset.trend){trendOffset=Math.max(0,trendOffset+(b.dataset.trend==='previous'?1:-1));render();return;}if(b.dataset.edit){editRecord(b,true);return;}if(b.dataset.editCancel){editRecord(b,false);return;}if(b.dataset.view){e.preventDefault();setMenuOpen(false);view=b.dataset.view;notice='';pouchFormOpen=false;pouchDraft=null;pendingPouch=null;skipCravingPrompt=false;if(view==='craving')ensureSudoku();clearTimeout(feedbackTimer);render();content.focus({preventScroll:true});window.scrollTo({top:0,behavior:'instant'});return}if(b.dataset.delete){const id=Number(b.dataset.delete);entries=entries.filter(x=>x.id!==id);purchases=purchases.filter(x=>x.id!==id);persist();notice='';render();return}const a=b.dataset.action;if(a==='activities'||a==='close-activities'){activityTrends=a==='activities';render();content.focus({preventScroll:true});window.scrollTo({top:0,behavior:'instant'});return;}if(a==='toggle-trends'){spendingTrends=!spendingTrends;trendOffset=0;render();return;}if(a==='update'){updateApp(b);return}if(a==='open-pouch'){if(pouchFormOpen){closePouchEntry();return;}pouchFormOpen=true;notice='';clearTimeout(feedbackTimer);render();content.querySelector('[data-action="open-pouch"]').focus({preventScroll:true});}else if(a==='cancel-pouch'){closePouchEntry();}else if(a==='undo'){const previous=entries;entries=entries.filter(e=>e.id!==lastAdded);if(!persist()){entries=previous;return;}closePouchEntry();}else if(a==='export'){const blob=new Blob([JSON.stringify({version:1,product,entries,purchases,options:customOptions,tapering},null,2)],{type:'application/json'});const url=URL.createObjectURL(blob),link=document.createElement('a');link.href=url;link.download='pouch-tracker-backup.json';link.click();setTimeout(()=>URL.revokeObjectURL(url),1000)}else if(a==='restore'){root.querySelector('#backup-file').click()}else if(a==='cancel')render();else if(a)form(a)});
 root.addEventListener('input',e=>{if(e.target.matches('[name="value"],.record-form textarea'))e.target.setCustomValidity('')});

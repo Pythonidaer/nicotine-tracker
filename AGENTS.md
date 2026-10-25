@@ -8,4 +8,4 @@ Use clear task labels, no emojis or text-character substitute icons, real SVGs w
 
 After app-shell changes, update the service-worker cache version. Check JavaScript syntax, affected user journeys, offline behavior, and narrow-screen layout. Report browser/device verification limits honestly.
 
-Use the color responsibilities and validation notes in DESIGN_GUIDANCE.md. Preserve the established green palette; seek human review before broad palette or hierarchy changes. Keep functional control boundaries separate from decorative dividers and test focus in selected states, not only against page backgrounds.
+Use the color responsibilities and validation notes in DESIGN_GUIDANCE.md. Follow docs/COLOR_PALETTE.md: muted blue actions and data, neutral saved feedback, amber target attention, red errors and green reserved for verified reduction comparisons. This user-approved palette supersedes the earlier green accent. Seek human review before further broad palette or hierarchy changes. Keep functional control boundaries separate from decorative dividers and test focus in selected states, not only against page backgrounds.

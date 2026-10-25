@@ -13,7 +13,7 @@ Read the three AI design reset files, content-and-tone/best-practices.md, projec
 | Nonmodal dropdown; no backdrop, focus trap, scroll lock or visible Menu/Close text | Navigation is a short destination list | Modal drawer | Escape/focus return, outside click, focus leaving header, destination selection, hidden focusability |
 | Oswald headings/controls and Merriweather reading text | Verified font pair on Atomic Design chapter 1, Designing Systems | Platform system fonts | Correct fonts online/offline, readable inputs and narrow-screen layout |
 | Compact tracking screens; larger article text and a distinct heading scale for resources | Logging and reading have different density needs | Same type scale everywhere | Tracker stays quick to scan; article headings and paragraphs remain readable |
-| Keep existing green, light/dark surfaces and restrained dividers | Preserve the established app identity | Copy reference orange palette | Contrast, focus visibility and meaningful grouping |
+| Muted blue actions/data with neutral light/dark surfaces; amber attention, red errors and reserved green reduction progress | User chose a precise measurement tool | Earlier general-purpose green accent | Pairwise contrast, meaningful state labels and both themes |
 | No reveal animations; only short disclosure and hamburger transitions | Core logging stays immediately available | Toolkit optional motion patterns | Reduced-motion support |
 
 Typography reference: [Designing Systems](https://atomicdesign.bradfrost.com/chapter-1/) and its /css/style.css. The reference uses Oswald for headings, Merriweather for .text passages, a large normal-weight title, 2em section headings with a rule, and 1.5em subheadings. Adapt those relationships to the app, rather than importing the book's full CSS. Fonts are self-hosted under fonts/ with their SIL Open Font Licenses and cached by the service worker. Use plain 1, 2, 3 sequence numbering and real SVG UI icons; no emojis or text substitutes.
@@ -219,50 +219,9 @@ Verification: syntax and regression checks cover differing count/dose rankings, 
 
 ## Color theory application
 
-Apply [docs/color-theory-rules.md](docs/color-theory-rules.md) before color-related interface work. Local snapshot from [the shared toolkit](https://github.com/Pythonidaer/llm-instruction-toolkit/blob/49cace465c4af1145710c2b0221622c35fe14e49/color-theory/README.md). Read the app-specific roles below alongside it; broad palette or hierarchy changes still need human review.
+Apply [docs/color-theory-rules.md](docs/color-theory-rules.md) alongside the current [palette specification](docs/COLOR_PALETTE.md). The user approved the muted-blue measurement palette, replacing the earlier general-purpose green accent. The palette specification is authoritative for current colors; earlier dated sections describe implementation history.
 
-### Color responsibilities
-
-| Token | Responsibility |
-| --- | --- |
-| `--p-bg` | Page, controls and dropdown surfaces |
-| `--p-fg` | Primary text and labels on the page surface |
-| `--p-muted` | Secondary text |
-| `--p-line` | Decorative dividers and grouping; not the sole input boundary |
-| `--p-control-border` | Form-field and picker boundaries, independent of decorative lines |
-| `--p-accent` | Approved green action, selected-state and chart treatment; review each use before a brand change |
-| `--p-on` | Text on the green filled surface |
-| `--p-focus-ring` | Keyboard focus outside ordinary controls, against the surrounding page surface |
-| `--p-focus-on-selected` | Inset focus on filled selected dropdown options |
-
-Keep semantic tokens directly expressed with light/dark values. An additional primitive/component layer has no demonstrated benefit at this size. Do not route error feedback through brand colors just to reuse a value. Existing text/pressed/selected attributes and labels convey meaning alongside color. Activity slice colors remain categorical data colors, accompanied by the full textual legend and counts; this is not a palette redesign.
-
-### Bounded implementation
-
-- Retain the established green palette, compact hierarchy and decorative divider colors.
-- Give inputs, date fields, textareas and custom picker triggers a distinguishable border in both themes.
-- Use a contrasting outside focus ring and an on-fill inset ring for selected picker options.
-- Scope hover/focus reveal overrides to the nicotine chart so they can override the global important hidden rule; touch still uses the explicit pressed toggle.
-- On short or zero-value chart bars, reveal counts on the page surface above the bar using primary text color. Temporarily replace the regular value label during the reveal to avoid overlap. Taller bars keep on-fill text; mobile pouch labels remain stacked and transparent.
-- Keep action meanings separate from prominence. No automatic red Delete button, extra confirmation, palette redistribution or decorative hue additions.
-
-### Measured contrast
-
-These are sRGB contrast calculations for the explicit CSS pairs, not a claim of complete WCAG compliance or verified usability.
-
-| Pair | Light | Dark |
-| --- | --- | --- |
-| Primary text / page | 13.81:1 | 14.76:1 |
-| Secondary text / page | 5.33:1 | 8.18:1 |
-| Accent text / page | 7.51:1 | 9.61:1 |
-| Text or inset focus / accent fill | 7.85:1 | 8.78:1 |
-| Control boundary / page | 5.33:1 | 8.18:1 |
-| Outside focus / page | 13.81:1 | 14.76:1 |
-
-Decorative dividers remain 1.28:1 / 1.57:1; they group content and do not define the input boundaries. No universal 60–30–10 ratio or hue count is imposed.
-
-Verification: contrast calculations, CSS token/selector checks, JavaScript syntax and nicotine/spending chart regression checks. Browser executable unavailable locally; native iOS focus, touch, light/dark appearance, large text, short-bar labels and offline reopening require device review. Pie slice focus against individual category fills is not covered by this bounded check and remains a follow-up review item.
-
+Keep action, data, reduction progress, attention and error roles independent even when values match. Preserve neutral logging feedback, accessible control boundaries, contextual keyboard focus, transparent stacked mobile chart labels and categorical activity labels. Green is reserved for verified reduction comparisons; logging a pouch, completing a game or merely being below a target is not reduction evidence.
 
 ## Repeat logging and appearance control
 
@@ -280,3 +239,10 @@ The Dark mode row is last in the dropdown with 16px separation above and no divi
 Use Google's Material Icons Outlined for menu/close, add-box, disclosure arrows, period navigation, money, nicotine-trends chart and activity tag. Reuse the same icon for each meaning across pages, keep existing 44px control alignment and accessible control names, and hide decorative SVGs from assistive technology. Bundle SVG paths locally in icons.js, precache with the app shell and keep Apache-2.0 license/provenance under icons/material/. The existing brand/PWA artwork stays; the activity pie remains data visualization.
 
 Verification: JavaScript syntax, theme/feedback regression, nicotine/spending chart regression, color contrast checks, bundled icon coverage and switch/focus/offline hooks. Browser/iOS visual and keyboard-device verification remains for review.
+
+
+## Blue measurement palette
+
+Implement the user-approved palette in both manual and system light/dark modes. See [docs/COLOR_PALETTE.md](docs/COLOR_PALETTE.md) for the exact tokens, semantics, contrast and verification. Daily nicotine/spending bars stay blue at every quantity. Use amber for active tapering totals at or above 80% of the relevant guide, including over-target totals; preserve the exact remaining/over-target labels and unrestricted logging. Invalid taper input and update failures use red with explanatory text. Routine saved feedback is neutral. Reserve green for a future explicit, trustworthy reduction comparison rather than adding a new comparison feature in this palette update.
+
+The current brand/PWA image remains existing artwork; its green is identity artwork, not a reduction indicator. Activity pie colors identify categories and remain independent of semantic progress/attention/error colors. Theme-color metadata follows the selected page surface; the manifest uses blue for its theme color. Advance the cached app shell without changing logs, backup schema or theme preference keys.

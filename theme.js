@@ -7,6 +7,7 @@
   function current(){return preference||(system.matches?'dark':'light');}
   function apply(){
     const mode=current();root.dataset.theme=mode;root.style.colorScheme=mode;
+    document.querySelector?.('meta[name="theme-color"]')?.setAttribute('content',mode==='dark'?'#191b1e':'#fafaf8');
     scope.dispatchEvent(new Event('pouch-theme-change'));
   }
   function set(mode){

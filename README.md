@@ -68,6 +68,10 @@ Open Quitting nicotine in the header menu for practical guidance on patterns, ch
 
 Read [AGENTS.md](AGENTS.md), [DESIGN_GUIDANCE.md](DESIGN_GUIDANCE.md) and the [color theory rules](docs/color-theory-rules.md). This app applies the shared toolkit design and content guidance with an opaque, non-sticky logo header and hamburger dropdown at every screen size. Today, History, Trends, Quitting nicotine, and Settings share that navigation. Typography uses self-hosted Oswald headings/controls and Merriweather reading text, following the Designing Systems reference. Motion reveals and the roadmap are optional patterns and are not enabled here.
 
+## Color palette
+
+The app uses a muted-blue measurement palette in light and dark mode. See [docs/COLOR_PALETTE.md](docs/COLOR_PALETTE.md) for exact colors, semantic responsibilities, contrast checks and state behavior. Blue identifies actions and data, amber marks daily-target attention, red marks errors, and green is reserved for verified reductions. The menu switch remembers your appearance preference.
+
 ## Refresh the installed app
 
 Settings → Update app checks for a service-worker update, refreshes the current app files, and reloads. It requires an internet connection and does not clear localStorage, logs, settings, or backups. There is no need to delete or reinstall the PWA. Export a backup regularly. Older installed versions can receive this Settings action by closing and reopening the app while online.
