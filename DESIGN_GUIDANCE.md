@@ -262,3 +262,12 @@ These are sRGB contrast calculations for the explicit CSS pairs, not a claim of 
 Decorative dividers remain 1.28:1 / 1.57:1; they group content and do not define the input boundaries. No universal 60–30–10 ratio or hue count is imposed.
 
 Verification: contrast calculations, CSS token/selector checks, JavaScript syntax and nicotine/spending chart regression checks. Browser executable unavailable locally; native iOS focus, touch, light/dark appearance, large text, short-bar labels and offline reopening require device review. Pie slice focus against individual category fills is not covered by this bounded check and remains a follow-up review item.
+
+
+## Repeat logging and appearance control
+
+Add pouch always keeps its heading/icon control. Saving returns to Today with Pouch added and Undo in a separate row beneath that heading; this feedback never replaces or disables Add pouch. Opening another pouch clears the previous feedback/timer and immediately shows the form. Undo still targets the most recent saved pouch. Expiration removes only the feedback node, never replaces the entry section or discards form input; keep feedback while Undo has keyboard focus.
+
+The navigation dropdown includes a labelled Dark mode switch. Default to the device color scheme until an explicit light/dark choice is made, then persist that preference independently in pouch-tracker-theme. Apply the choice in theme.js before loading the stylesheet to avoid a wrong-theme startup flash. A theme change leaves the current screen, unsaved forms and logs intact. If preference storage fails, apply it for the session and explain the failure. Existing tracking storage and version-1 backups are unchanged. Precache theme.js with the app shell.
+
+Verification: repeat-entry markup and independent Undo; safe feedback expiry/focus preservation; system appearance changes, explicit light/dark, reload persistence, invalid stored preference and blocked storage; JavaScript syntax. Browser/iPhone visual and offline checks remain for device review.

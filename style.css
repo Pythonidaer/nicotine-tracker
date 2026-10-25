@@ -297,3 +297,9 @@ body { margin: 0; background: var(--p-bg); color: var(--p-fg); }
 @media (hover: hover) and (pointer: fine) {
   #pouch-preview .nicotine-bars .trend-day:has(.bar-label-on-surface):hover > span:first-child { visibility: hidden; }
 }
+
+/* Keep logging available while its confirmation is visible. */
+#pouch-preview .pouch-feedback { margin: 0 0 8px; }
+/* Appearance is a setting within navigation, not a destination. */
+#pouch-preview nav .theme-toggle { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 44px; margin: 4px 0 0; padding: 10px 12px; border-top: 1px solid var(--p-line); color: var(--p-fg); font: 400 16px/1.3 var(--p-heading); cursor: pointer; }
+#pouch-preview .theme-toggle input { flex: none; width: 36px; min-height: 24px; height: 24px; padding: 0; margin: 0; accent-color: var(--p-accent); }

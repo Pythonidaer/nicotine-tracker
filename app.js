@@ -2,6 +2,15 @@
 (()=>{
 const root=document.getElementById('pouch-preview'),content=root.querySelector('main');
 const header=root.querySelector('.app-header'),menu=root.querySelector('#app-navigation'),menuToggle=root.querySelector('.menu-toggle');
+const themeToggle=root.querySelector('#theme-toggle');
+function syncThemeToggle(){themeToggle.checked=window.PouchTheme.current()==='dark';}
+syncThemeToggle();
+window.addEventListener('pouch-theme-change',syncThemeToggle);
+themeToggle.addEventListener('change',()=>{
+  const saved=window.PouchTheme.set(themeToggle.checked?'dark':'light');
+  syncThemeToggle();
+  if(!saved)alert('Theme changed for this session, but could not save your preference.');
+});
 function setMenuOpen(open){
   menu.hidden=!open;
   menuToggle.setAttribute('aria-expanded',String(open));
@@ -41,8 +50,8 @@ function pouchEntryMarkup(){
     <div class="form-actions"><button type="submit" class="primary">Save</button><button type="button" data-action="cancel-pouch">Cancel</button></div>
   </form>`:'';
   return `<section class="pouch-entry" aria-labelledby="pouch-entry-title"><div class="row pouch-entry-heading"><h2 id="pouch-entry-title">Add pouch</h2>
-    ${notice?`<div class="pouch-feedback" role="status" aria-live="polite">${notice}<button type="button" class="link" data-action="undo">Undo</button></div>`:`<button type="button" class="add-entry-icon" data-action="open-pouch" aria-label="${pouchFormOpen?'Close pouch entry':'Add pouch entry'}" aria-expanded="${pouchFormOpen}" aria-controls="pouch-entry-form">${pouchFormOpen?closeEntryIcon:addEntryIcon}</button>`}
-  </div><div id="pouch-entry-form" ${pouchFormOpen?'':'hidden'}>${fields}</div></section>`;
+    <button type="button" class="add-entry-icon" data-action="open-pouch" aria-label="${pouchFormOpen?'Close pouch entry':'Add pouch entry'}" aria-expanded="${pouchFormOpen}" aria-controls="pouch-entry-form">${pouchFormOpen?closeEntryIcon:addEntryIcon}</button>
+  </div>${notice?`<div class="pouch-feedback" role="status" aria-live="polite">${notice}<button type="button" class="link" data-action="undo">Undo</button></div>`:''}<div id="pouch-entry-form" ${pouchFormOpen?'':'hidden'}>${fields}</div></section>`;
 }
 // All entry fields share the same bounded popup and dismissal behavior.
 function closeEntryPicker(picker,restoreFocus=false){
@@ -123,7 +132,7 @@ function schedulePouchFeedbackDismissal(){
     const feedback=content.querySelector('.pouch-feedback');
     if(feedback?.contains(document.activeElement)){schedulePouchFeedbackDismissal();return;}
     notice='';
-    const section=content.querySelector('.pouch-entry');if(section)section.outerHTML=pouchEntryMarkup();
+    feedback?.remove();
   },4000);
 }
 function addPouchFromForm(form){
