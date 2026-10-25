@@ -1,5 +1,7 @@
 # Design guidance and decisions
 
+Current mobile interface specification: [docs/MOBILE_REVIEW.md](docs/MOBILE_REVIEW.md). It supersedes earlier dated decisions about tracking fonts, pie charts, bottom activity links, icon-only trend navigation, rolling periods and Settings organization. The blue measurement palette remains in force.
+
 Updated 2026-10-19. Shared source: [LLM Instruction Toolkit](https://github.com/Pythonidaer/llm-instruction-toolkit/tree/9e136f976f8b63e9063ac518ec36fdcb0804227a/design).
 
 Read the three AI design reset files, content-and-tone/best-practices.md, project-questions.md, and the navigation pattern when changing this interface. Apply relevant clean-code guidance to bounded changes. Explicit user choices take precedence over toolkit defaults.
@@ -11,7 +13,7 @@ Read the three AI design reset files, content-and-tone/best-practices.md, projec
 | Opaque, non-sticky logo header with hamburger disclosure at every width | User requested removing sticky frost and moving the bottom destinations into a dropdown | Toolkit sticky frosted header with desktop links | No blur or sticky header; all five destinations accessible at 320px and desktop |
 | Existing pouch icon and Pouch Tracker wordmark link to Today | Reuse approved identity and provide a home action | New branding | Keyboard name, link behavior and image fallback |
 | Nonmodal dropdown; no backdrop, focus trap, scroll lock or visible Menu/Close text | Navigation is a short destination list | Modal drawer | Escape/focus return, outside click, focus leaving header, destination selection, hidden focusability |
-| Oswald headings/controls and Merriweather reading text | Verified font pair on Atomic Design chapter 1, Designing Systems | Platform system fonts | Correct fonts online/offline, readable inputs and narrow-screen layout |
+| System UI tracking text, Oswald wordmark, Merriweather resource reading text | User-approved measurement readability review | Earlier Oswald controls/serif fields | 16px inputs, 14px supporting copy, clear heading/value scale |
 | Compact tracking screens; larger article text and a distinct heading scale for resources | Logging and reading have different density needs | Same type scale everywhere | Tracker stays quick to scan; article headings and paragraphs remain readable |
 | Muted blue actions/data with neutral light/dark surfaces; amber attention, red errors and reserved green reduction progress | User chose a precise measurement tool | Earlier general-purpose green accent | Pairwise contrast, meaningful state labels and both themes |
 | No reveal animations; only short disclosure and hamburger transitions | Core logging stays immediately available | Toolkit optional motion patterns | Reduced-motion support |

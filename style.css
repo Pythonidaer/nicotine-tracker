@@ -28,8 +28,13 @@
   --p-progress: light-dark(#276447, #94cba9);
   --p-attention: light-dark(#805500, #e8be68);
   --p-error: light-dark(#a02d36, #f1a0a6);
-  --p-heading: "Oswald", "Helvetica Neue", sans-serif;
-  --p-body: "Merriweather", Georgia, serif;
+  --p-brand-font: "Oswald", "Helvetica Neue", sans-serif;
+  --p-heading: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --p-body: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --p-reading: "Merriweather", Georgia, serif;
+  --p-space-field: 8px;
+  --p-space-group: 16px;
+  --p-space-section: 24px;
 }
 * { box-sizing: border-box; }
 html { scroll-padding-top: 16px; }
@@ -39,7 +44,7 @@ body { margin: 0; background: var(--p-bg); color: var(--p-fg); }
   max-width: 720px;
   min-height: 100dvh;
   margin: auto;
-  font: 400 14px/1.6 var(--p-body);
+  font: 400 16px/1.5 var(--p-body);
   display: flex;
   flex-direction: column;
 }
@@ -54,14 +59,14 @@ body { margin: 0; background: var(--p-bg); color: var(--p-fg); }
   background: var(--p-bg);
   border-bottom: 1px solid var(--p-line);
 }
-#pouch-preview .brand { display: inline-flex; align-items: center; gap: 10px; min-height: 44px; color: var(--p-fg); text-decoration: none; font: 400 24px/1.2 var(--p-heading); }
+#pouch-preview .brand { display: inline-flex; align-items: center; gap: 10px; min-height: 44px; color: var(--p-fg); text-decoration: none; font: 400 24px/1.2 var(--p-brand-font); }
 #pouch-preview .brand img { flex: none; border-radius: 6px; }
 #pouch-preview .menu-toggle { display: grid; place-items: center; width: 44px; padding: 10px; border-radius: 50%; }
 #pouch-preview main { min-width: 0; flex: 1; min-height: 320px; padding: 16px; scroll-margin-top: 16px; }
 #pouch-preview main:focus { outline: none; }
-#pouch-preview h2, #pouch-preview .recent > summary { color: var(--p-fg); font-family: var(--p-heading); font-size: 21px; line-height: 1.25; font-weight: 400; margin: 0 0 8px; }
-#pouch-preview h3 { font-family: var(--p-heading); font-size: 18px; line-height: 1.3; font-weight: 400; margin: 16px 0 4px; }
-#pouch-preview small, #pouch-preview .caption { font-size: 12px; color: var(--p-muted); }
+#pouch-preview h2, #pouch-preview .recent > summary { color: var(--p-fg); font-family: var(--p-heading); font-size: 22px; line-height: 1.3; font-weight: 600; margin: 0 0 8px; }
+#pouch-preview h3 { font-family: var(--p-heading); font-size: 18px; line-height: 1.35; font-weight: 600; margin: var(--p-space-section) 0 var(--p-space-field); }
+#pouch-preview small, #pouch-preview .caption { font-size: 14px; color: var(--p-muted); }
 #pouch-preview button, #pouch-preview input, #pouch-preview select, #pouch-preview textarea { font: inherit; }
 #pouch-preview button { font-family: var(--p-heading); font-size: 16px; line-height: 1.3; }
 #pouch-preview button {
@@ -86,14 +91,14 @@ body { margin: 0; background: var(--p-bg); color: var(--p-fg); }
   padding: 8px;
   font-size: 16px;
 }
-#pouch-preview label { display: block; font-size: 12px; margin: 12px 0 4px; color: var(--p-muted); }
+#pouch-preview label { display: block; font-size: 14px; margin: 12px 0 4px; color: var(--p-muted); }
 #pouch-preview .row { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
-#pouch-preview .totals { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; padding: 8px 0 12px; border-bottom: 1px solid var(--p-line); }
-#pouch-preview .value { font-family: var(--p-heading); font-size: 28px; font-weight: 400; font-variant-numeric: tabular-nums; }
+#pouch-preview .totals { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: 16px; padding: 8px 0 16px; }
+#pouch-preview .value { font-family: var(--p-heading); font-size: 30px; font-weight: 600; font-variant-numeric: tabular-nums; }
 #pouch-preview .entry { padding: 8px 0; border-bottom: 1px solid var(--p-line); display: flex; justify-content: space-between; align-items: center; gap: 12px; }
 #pouch-preview .entry > div { min-width: 0; overflow-wrap: anywhere; }
 #pouch-preview .entry small { display: block; }
-#pouch-preview nav {
+#pouch-preview #app-navigation {
   position: absolute;
   top: 100%;
   left: 0;
@@ -107,13 +112,13 @@ body { margin: 0; background: var(--p-bg); color: var(--p-fg); }
   border-bottom: 1px solid var(--p-line);
   box-shadow: 0 8px 12px rgb(0 0 0 / 6%);
 }
-#pouch-preview nav button { border: 0; text-align: left; padding: 10px 12px; min-height: 44px; }
-#pouch-preview nav button[aria-current="page"] { background: var(--p-accent); color: var(--p-on); }
-#pouch-preview .notice { font-size: 13px; color: var(--p-muted); margin-top: 8px; }
+#pouch-preview #app-navigation button { border: 0; text-align: left; padding: 10px 12px; min-height: 44px; }
+#pouch-preview #app-navigation button[aria-current="page"] { background: var(--p-accent); color: var(--p-on); }
+#pouch-preview .notice { font-size: 14px; color: var(--p-muted); margin-top: 8px; }
 #pouch-preview .actions, #pouch-preview .form-actions { display: flex; flex-wrap: wrap; gap: 12px; }
 #pouch-preview .form-actions { margin-top: 20px; }
-#pouch-preview .bars { display: flex; align-items: flex-end; gap: 12px; height: 145px; margin: 16px 0; }
-#pouch-preview .column { flex: 1; min-width: 0; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; height: 100%; font-size: 12px; }
+#pouch-preview .bars { display: flex; align-items: flex-end; gap: 6px; height: 174px; margin: 16px 0; }
+#pouch-preview .column { flex: 1; min-width: 0; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; height: 100%; font-size: 14px; }
 #pouch-preview .bar { width: 100%; background: var(--p-data); border-radius: 2px; margin: 4px 0; }
 #pouch-preview .empty { color: var(--p-muted); padding: 8px 0; }
 #pouch-preview .recent { border-top: 1px solid var(--p-line); margin-top: 12px; }
@@ -132,8 +137,8 @@ body { margin: 0; background: var(--p-bg); color: var(--p-fg); }
 @media (min-width: 640px) { #pouch-preview main { padding: 24px; } #pouch-preview .app-header { padding-inline: 24px; } }
 
 #pouch-preview a { color: var(--p-accent); text-underline-offset: .18em; }
-#pouch-preview .resource-page { font-size: clamp(1rem, .92rem + .35vw, 1.2rem); line-height: 1.65; overflow-wrap: anywhere; }
-#pouch-preview .resource-page h1 { font: 400 clamp(2.25rem, 6vw, 3.25rem)/1.05 var(--p-heading); margin: 0 0 16px; }
+#pouch-preview .resource-page { font-family: var(--p-reading); font-size: clamp(1rem, .92rem + .35vw, 1.2rem); line-height: 1.65; overflow-wrap: anywhere; }
+#pouch-preview .resource-page h1 { font: 600 clamp(2.25rem, 6vw, 3.25rem)/1.05 var(--p-heading); margin: 0 0 16px; }
 #pouch-preview .resource-page h2 { font-size: 2em; line-height: 1.2; color: var(--p-accent); margin: 1.6em 0 .5em; padding-bottom: 8px; border-bottom: 2px solid var(--p-fg); }
 #pouch-preview .resource-page h3 { font-size: 1.5em; margin: 1.25em 0 .5em; }
 #pouch-preview .resource-page p { margin: 0 0 1em; }
@@ -157,7 +162,7 @@ body { margin: 0; background: var(--p-bg); color: var(--p-fg); }
 #pouch-preview .record-form { padding-bottom: 4px; }
 #pouch-preview textarea { display: block; min-height: 144px; max-height: 320px; resize: vertical; }
 #pouch-preview .note-buttons { margin-top: 8px; }
-#pouch-preview .note-status { color: var(--p-muted); margin: 4px 0 0; font-size: 12px; }
+#pouch-preview .note-status { color: var(--p-muted); margin: 4px 0 0; font-size: 14px; }
 #pouch-preview .note-status:empty { display: none; }
 #pouch-preview .resource-page h2:focus { outline: none; }
 
@@ -165,7 +170,7 @@ body { margin: 0; background: var(--p-bg); color: var(--p-fg); }
 #pouch-preview .pouch-entry-heading h2 { margin: 0; }
 #pouch-preview .add-entry-icon { width: 44px; height: 44px; padding: 10px; display: grid; place-items: center; border: 0; color: var(--p-accent); }
 #pouch-preview .pouch-product-fields { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 12px; }
-#pouch-preview .pouch-feedback { display: flex; align-items: center; gap: 8px; color: var(--p-muted); font-size: 12px; }
+#pouch-preview .pouch-feedback { display: flex; align-items: center; gap: 8px; color: var(--p-muted); font-size: 14px; }
 @media (max-width: 340px) { #pouch-preview .pouch-product-fields { grid-template-columns: 1fr; gap: 0; } }
 
 /* Shared compact selectors for brand, strength and activity. */
@@ -183,7 +188,7 @@ body { margin: 0; background: var(--p-bg); color: var(--p-fg); }
 #pouch-preview .history-week + .history-week { margin-top: 28px; }
 #pouch-preview .history-week > h3 { margin: 16px 0 4px; padding-bottom: 8px; border-bottom: 1px solid var(--p-line); font-size: 16px; color: var(--p-muted); }
 
-#pouch-preview .purchase-section { margin-top: 12px; }
+#pouch-preview .purchase-section { margin-top: var(--p-space-section); padding-top: var(--p-space-group); border-top: 1px solid var(--p-line); }
 #pouch-preview .spending-totals { border-bottom: 0; padding-bottom: 0; }
 #pouch-preview .spending-totals .value { overflow-wrap: anywhere; }
 
@@ -211,49 +216,32 @@ body { margin: 0; background: var(--p-bg); color: var(--p-fg); }
 #pouch-preview .history-entry > summary > .chevron { justify-self: center; color: var(--p-accent); }
 
 /* Match overview title rows and section rhythm across tracking screens. */
-#pouch-preview .page-heading { display: flex; align-items: center; min-height: 44px; margin: 0; }
-#pouch-preview .settings-section { display: flow-root; padding-bottom: 12px; }
-#pouch-preview .settings-section + .settings-section { border-top: 1px solid var(--p-line); margin-top: 12px; }
+#pouch-preview .page-heading { display: flex; justify-content: space-between; align-items: center; gap: 12px; min-height: 44px; margin: 0 0 16px; }
+#pouch-preview .settings-section { display: flow-root; padding: var(--p-space-group) 0; }
+#pouch-preview .settings-section + .settings-section { border-top: 1px solid var(--p-line); margin-top: var(--p-space-field); }
 
-#pouch-preview .trend-period { display: grid; grid-template-columns: 44px minmax(0, 1fr) 44px; align-items: center; gap: 4px; text-align: center; }
+#pouch-preview .trend-period { margin: 16px 0; display: grid; grid-template-columns: 44px minmax(0, 1fr) 44px; align-items: center; gap: 4px; text-align: center; }
 #pouch-preview .trend-period button { display: grid; place-items: center; padding: 8px; }
-#pouch-preview .trend-period button:disabled { opacity: .3; cursor: default; }
+#pouch-preview .trend-period button:disabled { opacity: .4; cursor: default; }
 
-#pouch-preview button.trend-day { padding: 0; border: 0; border-radius: 0; background: transparent; color: var(--p-fg); font-family: var(--p-body); font-size: 12px; }
+#pouch-preview button.trend-day { padding: 0; border: 0; border-radius: 0; background: transparent; color: var(--p-fg); font-family: var(--p-body); font-size: 14px; }
 #pouch-preview .trend-day .bar { display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-#pouch-preview .bar-nicotine { color: var(--p-on); font: 400 11px/1.1 var(--p-heading); white-space: nowrap; }
+#pouch-preview .bar-nicotine { color: var(--p-on); font: 500 12px/1.2 var(--p-body); white-space: normal; text-align: center; }
 #pouch-preview .bar-nicotine[hidden] { display: none; }
 
 #pouch-preview .trend-averages-heading { border-top: 1px solid var(--p-line); padding-top: 16px; }
 #pouch-preview .totals.trend-averages { border-bottom: 0; }
 
-#pouch-preview .trend-view-link { display: flex; justify-content: flex-end; margin-top: 16px; }
-#pouch-preview .trend-view-link button { display: inline-flex; align-items: center; gap: 8px; }
-#pouch-preview .activity-chart { display: flex; justify-content: center; align-items: center; gap: 12px; margin: 16px 0; }
-#pouch-preview .activity-pie { width: 220px; max-width: 100%; height: auto; }
-#pouch-preview .activity-legend { list-style: none; padding: 0; margin: 0; }
-#pouch-preview .activity-legend li { display: grid; grid-template-columns: 10px minmax(0,1fr) auto; gap: 10px; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--p-line); }
-#pouch-preview .activity-swatch { width: 10px; height: 10px; border-radius: 2px; }
-#pouch-preview .activity-share { white-space: nowrap; font-variant-numeric: tabular-nums; }
-#pouch-preview .activity-legend li > span:nth-child(2) { overflow-wrap: anywhere; }
 
 /* Keep the trend view link at the viewport foot without covering chart content. */
-#pouch-preview main.trends-layout { display: flex; flex-direction: column; padding-bottom: max(16px, env(safe-area-inset-bottom)); }
-#pouch-preview main.trends-layout > * { flex-shrink: 0; }
-#pouch-preview .trends-layout > .trend-view-link { margin-top: auto; padding-top: 16px; }
 
 #pouch-preview .activity-total { padding: 12px 0; font-weight: 700; }
 
-#pouch-preview .activity-legend li.selected { color: var(--p-accent); }
-#pouch-preview .activity-slice { cursor: pointer; -webkit-tap-highlight-color: transparent; }
-#pouch-preview .activity-slice:focus-visible { outline: none; stroke: var(--p-fg); stroke-width: 2px; }
 
 /* Empty live regions must not add paragraph margins below Settings actions. */
 #pouch-preview #product-options-status:empty { margin: 0; }
 
 /* Optional reduction settings and craving break. */
-#pouch-preview .taper-switch { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 44px; margin: 0; }
-#pouch-preview .taper-switch input { width: 36px; min-height: 24px; height: 24px; padding: 0; margin: 0; flex: none; accent-color: var(--p-accent); }
 #pouch-preview .setting-status:empty { margin: 0; }
 #pouch-preview dialog { width: min(420px, calc(100% - 32px)); max-height: calc(100dvh - 32px); overflow: auto; padding: 20px; border: 1px solid var(--p-line); border-radius: 8px; background: var(--p-bg); color: var(--p-fg); }
 #pouch-preview dialog::backdrop { background: rgb(0 0 0 / .6); }
@@ -277,24 +265,22 @@ body { margin: 0; background: var(--p-bg); color: var(--p-fg); }
 
 /* Keep revealed pouch counts within their nicotine bar. */
 #pouch-preview .nicotine-bars .bar { position: relative; }
-#pouch-preview .nicotine-bars .bar-nicotine { position: absolute; bottom: 4px; left: 0; width: 100%; padding: 0; background: transparent; text-align: center; white-space: normal; }
-#pouch-preview .nicotine-bars .trend-day:focus-visible .bar-nicotine[hidden] { display: block !important; }
+#pouch-preview .trend-day .bar-nicotine { position: absolute; bottom: 4px; left: 0; width: 100%; padding: 0; background: transparent; text-align: center; white-space: normal; }
+#pouch-preview .trend-day:focus-visible .bar-nicotine[hidden] { display: block !important; }
 @media (hover: hover) and (pointer: fine) {
-  #pouch-preview .nicotine-bars .trend-day:hover .bar-nicotine[hidden] { display: block !important; }
+  #pouch-preview .trend-day:hover .bar-nicotine[hidden] { display: block !important; }
 }
 
-#pouch-preview .nicotine-bars .pouch-count-break { display: none; }
-@media (max-width: 639px) {
-  #pouch-preview .nicotine-bars .pouch-count-break { display: block; }
-}
+#pouch-preview .pouch-count-break { display: block; }
+
 
 /* Short bars show revealed counts on the page surface, replacing the mg/$ label. */
 #pouch-preview .trend-day .bar { position: relative; }
 #pouch-preview .trend-day .bar-label-on-surface { position: absolute; bottom: calc(100% + 4px); left: 0; width: 100%; color: var(--p-fg); background: transparent; text-align: center; white-space: normal; }
 #pouch-preview .trend-day:has(.bar-label-on-surface)[aria-pressed="true"] > span:first-child,
-#pouch-preview .nicotine-bars .trend-day:has(.bar-label-on-surface):focus-visible > span:first-child { visibility: hidden; }
+#pouch-preview .trend-day:has(.bar-label-on-surface):focus-visible > span:first-child { visibility: hidden; }
 @media (hover: hover) and (pointer: fine) {
-  #pouch-preview .nicotine-bars .trend-day:has(.bar-label-on-surface):hover > span:first-child { visibility: hidden; }
+  #pouch-preview .trend-day:has(.bar-label-on-surface):hover > span:first-child { visibility: hidden; }
 }
 
 /* Keep logging available while its confirmation is visible. */
@@ -329,3 +315,45 @@ body { margin: 0; background: var(--p-bg); color: var(--p-fg); }
 #pouch-preview input[aria-invalid="true"] { color: var(--p-error); }
 #pouch-preview :is(input, select, textarea)[aria-invalid="true"],
 #pouch-preview :is(input, select, textarea):user-invalid { border-color: var(--p-error); }
+
+/* Frequent destinations stay visible; the dropdown contains occasional tasks. */
+#pouch-preview .primary-navigation { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 8px; padding: 4px 16px 8px; border-bottom: 1px solid var(--p-line); }
+#pouch-preview .primary-navigation button { border: 0; border-radius: 0; padding: 8px 4px; background: transparent; color: var(--p-muted); font-weight: 500; border-bottom: 2px solid transparent; }
+#pouch-preview .primary-navigation button[aria-current="page"] { color: var(--p-accent); border-bottom-color: var(--p-accent); }
+#pouch-preview .page-heading h2 { margin: 0; }
+#pouch-preview .today-totals { grid-template-columns: minmax(0,1.3fr) minmax(0,1fr); align-items: end; padding-bottom: 16px; }
+#pouch-preview .today-totals .value { font-size: 30px; line-height: 1.2; overflow-wrap: anywhere; }
+#pouch-preview .today-totals > :first-child .value { font-size: 40px; }
+#pouch-preview .today-totals .value small { font-size: 16px; }
+#pouch-preview .today-totals .caption { margin-top: 6px; }
+#pouch-preview .entry-row-heading { margin: 0; }
+#pouch-preview button.entry-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; width: 100%; padding: 0; border: 0; color: var(--p-accent); font-size: 20px; font-weight: 600; text-align: left; }
+#pouch-preview .entry-row-icon { display: grid; place-items: center; flex: none; width: 44px; height: 44px; }
+#pouch-preview .section-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+#pouch-preview .section-heading h3 { margin: 0; }
+#pouch-preview .purchase-action { display: inline-flex; align-items: center; gap: 8px; padding-right: 12px; }
+#pouch-preview .spending-totals .value { font-size: 22px; }
+#pouch-preview .recent { margin-top: 24px; padding-top: 8px; }
+#pouch-preview h4 { margin: 20px 0 8px; font-size: 16px; font-weight: 600; }
+#pouch-preview .settings-section > h3 { margin-top: 0; }
+#pouch-preview .switch-control { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 44px; color: var(--p-fg); margin: 12px 0; }
+#pouch-preview .trend-selector { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 4px; border-bottom: 1px solid var(--p-line); }
+#pouch-preview .trend-selector button { border: 0; border-radius: 0; padding: 8px 2px; border-bottom: 2px solid transparent; font-size: 14px; }
+#pouch-preview .trend-selector button[aria-pressed="true"] { border-bottom-color: var(--p-accent); color: var(--p-accent); font-weight: 600; }
+#pouch-preview .chart-context { display: flex; justify-content: space-between; gap: 8px 16px; flex-wrap: wrap; }
+#pouch-preview .chart-context > :last-child { text-align: right; }
+#pouch-preview .trend-day .bar-value { font-size: 12px; font-variant-numeric: tabular-nums; }
+#pouch-preview .trend-day > small { font-size: 12px; }
+#pouch-preview .average-context { margin: 0 0 8px; }
+#pouch-preview .chart-empty { margin: 0 0 16px; }
+#pouch-preview .activity-bars { list-style: none; padding: 0; margin: 16px 0; }
+#pouch-preview .activity-bars li { margin: 0 0 20px; }
+#pouch-preview .activity-bar-label { display: grid; grid-template-columns: minmax(0,1fr) auto; gap: 12px; align-items: start; font-size: 14px; margin-bottom: 8px; }
+#pouch-preview .activity-bar-label > :first-child { overflow-wrap: anywhere; }
+#pouch-preview .activity-bar-label > :last-child { white-space: nowrap; font-variant-numeric: tabular-nums; }
+#pouch-preview .activity-bar-track { height: 8px; background: var(--p-line); }
+#pouch-preview .activity-bar-track > span { display: block; height: 100%; background: var(--p-data); }
+#pouch-preview .activity-total { border-top: 1px solid var(--p-line); font-size: 14px; }
+@media (min-width: 640px) {
+  #pouch-preview .primary-navigation { padding-inline: 24px; }
+}

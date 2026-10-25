@@ -3,7 +3,7 @@
 Compact, offline-first PWA for personal nicotine-pouch logging. No accounts, database, or analytics services. Starts with empty logs. Defaults to Zyn 6 mg until changed in Settings.
 
 ## Features
-Compact add-entry form with default brand/strength, optional activity, brief saved feedback and undo; labeled mg totals; actual tin purchases; calendar-week (Monday start) and month spending; collapsed history entries with notes and deletion; seven-day trends; default product settings; validated JSON export/restore.
+Nicotine-first Today overview, full-row Add pouch action, default brand/strength, optional activity, separate saved feedback and Undo; actual tin purchases; Monday-start calendar weeks; editable weekly History; labelled nicotine/spending/activity Trends with shared daily scales and horizontal activity bars; custom brands/strengths, optional reduction target, Sudoku craving break, light/dark switch and validated JSON export/restore.
 
 Data remains in this browser/device. Unlogged days are unknown. Export backups regularly. Labeled mg is product content, not absorbed nicotine.
 
@@ -66,7 +66,7 @@ Open Quitting nicotine in the header menu for practical guidance on patterns, ch
 
 ## Design instructions
 
-Read [AGENTS.md](AGENTS.md), [DESIGN_GUIDANCE.md](DESIGN_GUIDANCE.md) and the [color theory rules](docs/color-theory-rules.md). This app applies the shared toolkit design and content guidance with an opaque, non-sticky logo header and hamburger dropdown at every screen size. Today, History, Trends, Quitting nicotine, and Settings share that navigation. Typography uses self-hosted Oswald headings/controls and Merriweather reading text, following the Designing Systems reference. Motion reveals and the roadmap are optional patterns and are not enabled here.
+Read [AGENTS.md](AGENTS.md), [DESIGN_GUIDANCE.md](DESIGN_GUIDANCE.md) and the [color theory rules](docs/color-theory-rules.md). This app applies the shared toolkit design and content guidance with an opaque, non-sticky logo header and hamburger dropdown at every screen size. Today, History and Trends stay visible below the header; occasional destinations remain in the dropdown. Tracking uses system UI text for readability; Oswald remains in the wordmark and Merriweather in the resource article. See [the mobile review specification](docs/MOBILE_REVIEW.md) for current layout, typography, chart calculations and Settings organization. Motion reveals and the roadmap are optional patterns and are not enabled here.
 
 ## Color palette
 
@@ -78,12 +78,12 @@ Settings → Update app checks for a service-worker update, refreshes the curren
 
 ## Entry notes
 
-In History, expand an entry using the right-hand chevron. Choose Add note or Edit note to reveal a two-line editor; save or cancel without leaving the list. The same controls are available in Recent entries. Notes are optional, up to 1,000 characters, and stored on this device alongside the entry. Saving a blank note clears it. Export/restore includes notes; older version-1 backups without notes still work. Deleting an entry also removes its note.
+In History, expand an entry and choose Edit entry to update its brand, strength, activity and optional note. Purchase entries expose purchase fields and notes. Today’s Recent entries stays read-only. Notes support up to 1,000 characters; exports/restores preserve them, and older backups may omit them.
 
-The resource article's contents links scroll directly to their sections and move keyboard focus to the section heading. Reduced-motion preferences disable smooth scrolling.
+The resource article’s contents links scroll directly to their section and move focus to the section heading. Reduced-motion preferences disable smooth scrolling.
 
 ## Add a pouch entry
 
-On Today, tap the add-entry icon beside Add pouch. Brand and nicotine per pouch are prefilled from Settings. Adjust them for this entry, optionally choose what you are doing, then tap Add pouch. Saving closes the form and shows Pouch added with Undo for about four seconds before restoring the add icon. Keyboard focus on Undo keeps the feedback available. Cancel discards the unsaved entry. Per-entry changes do not overwrite your default product, and activity starts unspecified to avoid carrying a stale situation forward.
+On Today, tap anywhere on the Add pouch row. Brand and nicotine per pouch are prefilled from Settings. Adjust them for this entry, optionally choose what you are doing, then tap Save. Saving closes the form and shows Pouch added with Undo for about four seconds before restoring the add icon. Keyboard focus on Undo keeps the feedback available. Cancel discards the unsaved entry. Per-entry changes do not overwrite your default product, and activity starts unspecified to avoid carrying a stale situation forward.
 
 Activities: Working at kiosk, Concentrating on computer, At comedy, At a movie, At home, After eating, Traveling, Taking a break, Socializing, After waking up, Other. Activity is shown in History/Recent entries and included in backups. Existing version-1 entries without activity still work. This is descriptive context, not a diagnosis or treatment recommendation.

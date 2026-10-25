@@ -29,8 +29,8 @@ User-approved direction: a precise nicotine measurement tool. Muted blue support
 - Red: invalid taper percentage, native user-invalid form-field borders and Update app failures. Keep explanatory text, native validity messages and aria-invalid where applicable. Native alert dialogs remain OS-controlled, including storage failures.
 - Focus: use the independent primary-text ring outside ordinary controls and on-fill ring inside selected picker options. Existing hover, focus-visible, pressed, selected and disabled behaviors stay. Theme toggling preserves the current page and form drafts.
 - Short chart bars: revealed counts above short/zero bars use primary page text color and replace the usual value label during the reveal. Taller-bar labels use on-fill text. Mobile pouch counts remain stacked with transparent backgrounds.
-- Activity charts: the existing category palette is separate from semantic feedback. Colors identify activities; a green category does not imply progress and a red-toned category does not imply error. Keep the text legend, percentages/counts and pressed state.
-- Brand artwork: existing installed-PWA/brand images are retained. Their green is identity artwork rather than an interface progress state. Replacing that artwork is a separate branding decision.
+- Activity charts: use horizontal bars in the same data blue, with a direct activity label, percentage and pouch count. All categories share the same 0–100% scale; color does not rank activities as good/bad. This supersedes the earlier pie and multicolor legend.
+- Brand artwork: the header uses a matching blue SVG pouch mark. Existing PNG installed-PWA icons remain for iOS compatibility and existing installations; they are identity artwork, not progress indicators.
 
 ## Token dependencies
 
@@ -60,6 +60,7 @@ Text pairs meet the checked 4.5:1 threshold; control boundaries meet 3:1. These 
 Run:
 
 ```sh
+node tests/mobile-layout.test.cjs
 node tests/color-contrast.test.cjs
 node tests/palette-states.test.cjs
 node tests/feedback-theme.test.cjs
