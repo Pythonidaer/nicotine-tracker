@@ -21,4 +21,7 @@ const first=day(),second=day(),content={querySelectorAll:()=>[first,second]};
 click(first,content);assert.equal(first.getAttribute('aria-pressed'),'true');assert.equal(first.querySelector().hidden,false);
 click(second,content);assert.equal(first.getAttribute('aria-pressed'),'false');assert.equal(first.querySelector().hidden,true);assert.equal(second.querySelector().hidden,false);
 click(second,content);assert.equal(second.querySelector().hidden,true);
+assert(result.nicotine.includes('class="bar-nicotine bar-label-on-surface" hidden>1 <br class="pouch-count-break">Pouch</span>'));
+const withShortPurchase=new Function(fixtures+trends+';purchases.push({date:ago(1),tins:1,amount:0});spendingTrends=true;return trendsMarkup();')();
+assert(withShortPurchase.includes('class="bar-nicotine bar-label-on-surface" hidden>1 tin</span>'));
 console.log('PASS: nicotine totals, heights, zero/decimal doses, missing days, pouch reveals, toggle switching and spending regression.');

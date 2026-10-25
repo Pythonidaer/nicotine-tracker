@@ -20,6 +20,10 @@
   --p-line: light-dark(#dedfd9, #383d39);
   --p-accent: light-dark(#365947, #a4c9b0);
   --p-on: light-dark(#fff, #17251b);
+  /* Functional roles stay independent of decorative dividers and brand accents. */
+  --p-control-border: light-dark(#626a65, #aab4ad);
+  --p-focus-ring: light-dark(#252b28, #e9ede9);
+  --p-focus-on-selected: light-dark(#fff, #17251b);
   --p-heading: "Oswald", "Helvetica Neue", sans-serif;
   --p-body: "Merriweather", Georgia, serif;
 }
@@ -71,13 +75,13 @@ body { margin: 0; background: var(--p-bg); color: var(--p-fg); }
 }
 #pouch-preview button.primary { background: var(--p-accent); color: var(--p-on); border-color: var(--p-accent); }
 #pouch-preview button.link { border: 0; color: var(--p-accent); }
-#pouch-preview :is(button, input, select, textarea, summary, a):focus-visible { outline: 2px solid var(--p-accent); outline-offset: 3px; }
+#pouch-preview :is(button, input, select, textarea, summary, a):focus-visible { outline: 2px solid var(--p-focus-ring); outline-offset: 3px; }
 #pouch-preview input, #pouch-preview select, #pouch-preview textarea {
   width: 100%;
   min-height: 44px;
   background: var(--p-bg);
   color: var(--p-fg);
-  border: 1px solid var(--p-line);
+  border: 1px solid var(--p-control-border);
   border-radius: 6px;
   padding: 8px;
   font-size: 16px;
@@ -167,7 +171,7 @@ body { margin: 0; background: var(--p-bg); color: var(--p-fg); }
 
 /* Shared compact selectors for brand, strength and activity. */
 #pouch-preview .entry-picker { position: relative; }
-#pouch-preview .picker-trigger { width: 100%; min-height: 44px; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 8px; border: 1px solid var(--p-line); border-radius: 6px; background: var(--p-bg); color: var(--p-fg); font-family: inherit; font-size: 16px; text-align: left; }
+#pouch-preview .picker-trigger { width: 100%; min-height: 44px; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 8px; border: 1px solid var(--p-control-border); border-radius: 6px; background: var(--p-bg); color: var(--p-fg); font-family: inherit; font-size: 16px; text-align: left; }
 #pouch-preview .picker-value { min-width: 0; overflow-wrap: anywhere; }
 #pouch-preview .picker-trigger[aria-expanded="true"] .chevron { transform: rotate(180deg); }
 #pouch-preview .picker-options { position: absolute; top: calc(100% + 4px); left: 0; right: 0; z-index: 5; max-height: min(220px, 40dvh); overflow-y: auto; overscroll-behavior: contain; background: var(--p-bg); border: 1px solid var(--p-line); border-radius: 6px; padding: 4px; box-shadow: 0 6px 16px rgb(0 0 0 / 18%); }
@@ -175,6 +179,7 @@ body { margin: 0; background: var(--p-bg); color: var(--p-fg); }
 #pouch-preview .picker-options button { display: block; width: 100%; min-height: 44px; padding: 8px; border: 0; border-radius: 3px; font-family: inherit; font-size: 14px; text-align: left; overflow-wrap: anywhere; }
 #pouch-preview .picker-options button[aria-selected="true"] { background: var(--p-accent); color: var(--p-on); }
 #pouch-preview .picker-options button:focus-visible { outline-offset: -2px; }
+#pouch-preview .picker-options button[aria-selected="true"]:focus-visible { outline-color: var(--p-focus-on-selected); }
 
 #pouch-preview .history-week + .history-week { margin-top: 28px; }
 #pouch-preview .history-week > h3 { margin: 16px 0 4px; padding-bottom: 8px; border-bottom: 1px solid var(--p-line); font-size: 16px; color: var(--p-muted); }
@@ -274,12 +279,21 @@ body { margin: 0; background: var(--p-bg); color: var(--p-fg); }
 /* Keep revealed pouch counts within their nicotine bar. */
 #pouch-preview .nicotine-bars .bar { position: relative; }
 #pouch-preview .nicotine-bars .bar-nicotine { position: absolute; bottom: 4px; left: 0; width: 100%; padding: 0; background: transparent; text-align: center; white-space: normal; }
-#pouch-preview .nicotine-bars .trend-day:focus-visible .bar-nicotine[hidden] { display: block; }
+#pouch-preview .nicotine-bars .trend-day:focus-visible .bar-nicotine[hidden] { display: block !important; }
 @media (hover: hover) and (pointer: fine) {
-  #pouch-preview .nicotine-bars .trend-day:hover .bar-nicotine[hidden] { display: block; }
+  #pouch-preview .nicotine-bars .trend-day:hover .bar-nicotine[hidden] { display: block !important; }
 }
 
 #pouch-preview .nicotine-bars .pouch-count-break { display: none; }
 @media (max-width: 639px) {
   #pouch-preview .nicotine-bars .pouch-count-break { display: block; }
+}
+
+/* Short bars show revealed counts on the page surface, replacing the mg/$ label. */
+#pouch-preview .trend-day .bar { position: relative; }
+#pouch-preview .trend-day .bar-label-on-surface { position: absolute; bottom: calc(100% + 4px); left: 0; width: 100%; color: var(--p-fg); background: transparent; text-align: center; white-space: normal; }
+#pouch-preview .trend-day:has(.bar-label-on-surface)[aria-pressed="true"] > span:first-child,
+#pouch-preview .nicotine-bars .trend-day:has(.bar-label-on-surface):focus-visible > span:first-child { visibility: hidden; }
+@media (hover: hover) and (pointer: fine) {
+  #pouch-preview .nicotine-bars .trend-day:has(.bar-label-on-surface):hover > span:first-child { visibility: hidden; }
 }

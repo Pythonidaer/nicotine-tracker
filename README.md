@@ -66,7 +66,7 @@ Open Quitting nicotine in the header menu for practical guidance on patterns, ch
 
 ## Design instructions
 
-Read [AGENTS.md](AGENTS.md) and [DESIGN_GUIDANCE.md](DESIGN_GUIDANCE.md). This app applies the shared toolkit design and content guidance with an opaque, non-sticky logo header and hamburger dropdown at every screen size. Today, History, Trends, Quitting nicotine, and Settings share that navigation. Typography uses self-hosted Oswald headings/controls and Merriweather reading text, following the Designing Systems reference. Motion reveals and the roadmap are optional patterns and are not enabled here.
+Read [AGENTS.md](AGENTS.md), [DESIGN_GUIDANCE.md](DESIGN_GUIDANCE.md) and the [color theory rules](docs/color-theory-rules.md). This app applies the shared toolkit design and content guidance with an opaque, non-sticky logo header and hamburger dropdown at every screen size. Today, History, Trends, Quitting nicotine, and Settings share that navigation. Typography uses self-hosted Oswald headings/controls and Merriweather reading text, following the Designing Systems reference. Motion reveals and the roadmap are optional patterns and are not enabled here.
 
 ## Refresh the installed app
 

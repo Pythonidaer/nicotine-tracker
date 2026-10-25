@@ -215,3 +215,50 @@ Verification: syntax compilation, taper regression, 50 transformed puzzles indep
 The nicotine Trends chart is headed Nicotine logged. Daily nicotine sums in mg set bar heights and visible labels; logged nicotine-free days remain 0 mg, while days without records retain the dash. Tapping a bar toggles its pouch-count reveal and closes the previous selection. Mouse hover and keyboard-visible focus also reveal pouch counts. Keep accessible date/mg/count labels, singular/plural wording, weekly navigation, paired seven-day averages and spending/activity views. Short and zero-mg bars keep the revealed count readable.
 
 Verification: syntax and regression checks cover differing count/dose rankings, zero and decimal doses, missing days, pouch-count selection toggles and spending. Browser verification could not run because the local Playwright browser executable is unavailable; native iOS layout and touch remain for device review. Advance app-shell/cache versions together without changing saved data.
+
+
+## Color theory application
+
+Apply [docs/color-theory-rules.md](docs/color-theory-rules.md) before color-related interface work. Local snapshot from [the shared toolkit](https://github.com/Pythonidaer/llm-instruction-toolkit/blob/49cace465c4af1145710c2b0221622c35fe14e49/color-theory/README.md). Read the app-specific roles below alongside it; broad palette or hierarchy changes still need human review.
+
+### Color responsibilities
+
+| Token | Responsibility |
+| --- | --- |
+| `--p-bg` | Page, controls and dropdown surfaces |
+| `--p-fg` | Primary text and labels on the page surface |
+| `--p-muted` | Secondary text |
+| `--p-line` | Decorative dividers and grouping; not the sole input boundary |
+| `--p-control-border` | Form-field and picker boundaries, independent of decorative lines |
+| `--p-accent` | Approved green action, selected-state and chart treatment; review each use before a brand change |
+| `--p-on` | Text on the green filled surface |
+| `--p-focus-ring` | Keyboard focus outside ordinary controls, against the surrounding page surface |
+| `--p-focus-on-selected` | Inset focus on filled selected dropdown options |
+
+Keep semantic tokens directly expressed with light/dark values. An additional primitive/component layer has no demonstrated benefit at this size. Do not route error feedback through brand colors just to reuse a value. Existing text/pressed/selected attributes and labels convey meaning alongside color. Activity slice colors remain categorical data colors, accompanied by the full textual legend and counts; this is not a palette redesign.
+
+### Bounded implementation
+
+- Retain the established green palette, compact hierarchy and decorative divider colors.
+- Give inputs, date fields, textareas and custom picker triggers a distinguishable border in both themes.
+- Use a contrasting outside focus ring and an on-fill inset ring for selected picker options.
+- Scope hover/focus reveal overrides to the nicotine chart so they can override the global important hidden rule; touch still uses the explicit pressed toggle.
+- On short or zero-value chart bars, reveal counts on the page surface above the bar using primary text color. Temporarily replace the regular value label during the reveal to avoid overlap. Taller bars keep on-fill text; mobile pouch labels remain stacked and transparent.
+- Keep action meanings separate from prominence. No automatic red Delete button, extra confirmation, palette redistribution or decorative hue additions.
+
+### Measured contrast
+
+These are sRGB contrast calculations for the explicit CSS pairs, not a claim of complete WCAG compliance or verified usability.
+
+| Pair | Light | Dark |
+| --- | --- | --- |
+| Primary text / page | 13.81:1 | 14.76:1 |
+| Secondary text / page | 5.33:1 | 8.18:1 |
+| Accent text / page | 7.51:1 | 9.61:1 |
+| Text or inset focus / accent fill | 7.85:1 | 8.78:1 |
+| Control boundary / page | 5.33:1 | 8.18:1 |
+| Outside focus / page | 13.81:1 | 14.76:1 |
+
+Decorative dividers remain 1.28:1 / 1.57:1; they group content and do not define the input boundaries. No universal 60–30–10 ratio or hue count is imposed.
+
+Verification: contrast calculations, CSS token/selector checks, JavaScript syntax and nicotine/spending chart regression checks. Browser executable unavailable locally; native iOS focus, touch, light/dark appearance, large text, short-bar labels and offline reopening require device review. Pie slice focus against individual category fills is not covered by this bounded check and remains a follow-up review item.
