@@ -53,10 +53,6 @@ body { margin: 0; background: var(--p-bg); color: var(--p-fg); }
 #pouch-preview .brand { display: inline-flex; align-items: center; gap: 10px; min-height: 44px; color: var(--p-fg); text-decoration: none; font: 400 24px/1.2 var(--p-heading); }
 #pouch-preview .brand img { flex: none; border-radius: 6px; }
 #pouch-preview .menu-toggle { display: grid; place-items: center; width: 44px; padding: 10px; border-radius: 50%; }
-#pouch-preview .menu-toggle path { transform-origin: 12px 12px; }
-#pouch-preview .menu-toggle[aria-expanded="true"] .menu-top { transform: translateY(6px) rotate(45deg); transform-origin: 12px 6px; }
-#pouch-preview .menu-toggle[aria-expanded="true"] .menu-middle { opacity: 0; }
-#pouch-preview .menu-toggle[aria-expanded="true"] .menu-bottom { transform: translateY(-6px) rotate(-45deg); transform-origin: 12px 18px; }
 #pouch-preview main { min-width: 0; flex: 1; min-height: 320px; padding: 16px; scroll-margin-top: 16px; }
 #pouch-preview main:focus { outline: none; }
 #pouch-preview h2, #pouch-preview .recent > summary { color: var(--p-fg); font-family: var(--p-heading); font-size: 21px; line-height: 1.25; font-weight: 400; margin: 0 0 8px; }
@@ -126,7 +122,6 @@ body { margin: 0; background: var(--p-bg); color: var(--p-fg); }
 #pouch-preview button:disabled { opacity: .65; cursor: wait; }
 @media (prefers-reduced-motion: no-preference) {
   #pouch-preview .chevron { transition: transform 150ms ease; }
-  #pouch-preview .menu-toggle path { transition: transform 250ms ease, opacity 200ms ease; }
   #pouch-preview #app-navigation:not([hidden]) { animation: menu-open 220ms cubic-bezier(.2,.7,.3,1); }
 }
 @keyframes menu-open { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: translateY(0); } }
@@ -301,5 +296,23 @@ body { margin: 0; background: var(--p-bg); color: var(--p-fg); }
 /* Keep logging available while its confirmation is visible. */
 #pouch-preview .pouch-feedback { margin: 0 0 8px; }
 /* Appearance is a setting within navigation, not a destination. */
-#pouch-preview nav .theme-toggle { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 44px; margin: 4px 0 0; padding: 10px 12px; border-top: 1px solid var(--p-line); color: var(--p-fg); font: 400 16px/1.3 var(--p-heading); cursor: pointer; }
-#pouch-preview .theme-toggle input { flex: none; width: 36px; min-height: 24px; height: 24px; padding: 0; margin: 0; accent-color: var(--p-accent); }
+#pouch-preview nav .theme-toggle { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 44px; margin: 16px 0 0; padding: 10px 12px; border: 0; color: var(--p-fg); font: 400 16px/1.3 var(--p-heading); cursor: pointer; }
+
+#pouch-preview .material-icon { display: block; flex: none; }
+#pouch-preview .menu-toggle .menu-close-icon { display: none; }
+#pouch-preview .menu-toggle[aria-expanded="true"] .menu-open-icon { display: none; }
+#pouch-preview .menu-toggle[aria-expanded="true"] .menu-close-icon { display: block; }
+/* A labelled native switch supplies semantics; the visible track replaces its checkbox. */
+#pouch-preview .theme-toggle { position: relative; }
+#pouch-preview .theme-toggle input { position: absolute; opacity: 0; width: 1px; min-width: 0; height: 1px; min-height: 0; padding: 0; margin: 0; border: 0; }
+#pouch-preview .theme-switch-track { display: flex; align-items: center; flex: none; width: 40px; height: 24px; padding: 3px; border: 1px solid var(--p-control-border); border-radius: 12px; background: var(--p-bg); }
+#pouch-preview .theme-switch-thumb { display: block; width: 16px; height: 16px; border-radius: 50%; background: var(--p-muted); }
+#pouch-preview .theme-toggle input:checked + .theme-switch-track { background: var(--p-accent); border-color: var(--p-accent); }
+#pouch-preview .theme-toggle input:checked + .theme-switch-track .theme-switch-thumb { margin-left: auto; background: var(--p-on); }
+#pouch-preview .theme-toggle input:focus-visible + .theme-switch-track { outline: 2px solid var(--p-focus-ring); outline-offset: 3px; }
+@media (forced-colors: active) {
+  #pouch-preview .theme-switch-track { border-color: ButtonText; }
+  #pouch-preview .theme-switch-thumb { background: ButtonText; }
+  #pouch-preview .theme-toggle input:checked + .theme-switch-track { background: Highlight; border-color: Highlight; }
+  #pouch-preview .theme-toggle input:checked + .theme-switch-track .theme-switch-thumb { background: HighlightText; }
+}

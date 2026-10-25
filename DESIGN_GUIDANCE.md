@@ -271,3 +271,12 @@ Add pouch always keeps its heading/icon control. Saving returns to Today with Po
 The navigation dropdown includes a labelled Dark mode switch. Default to the device color scheme until an explicit light/dark choice is made, then persist that preference independently in pouch-tracker-theme. Apply the choice in theme.js before loading the stylesheet to avoid a wrong-theme startup flash. A theme change leaves the current screen, unsaved forms and logs intact. If preference storage fails, apply it for the session and explain the failure. Existing tracking storage and version-1 backups are unchanged. Precache theme.js with the app shell.
 
 Verification: repeat-entry markup and independent Undo; safe feedback expiry/focus preservation; system appearance changes, explicit light/dark, reload persistence, invalid stored preference and blocked storage; JavaScript syntax. Browser/iPhone visual and offline checks remain for device review.
+
+
+## Menu switch and Material interface icons
+
+The Dark mode row is last in the dropdown with 16px separation above and no divider. Its labelled native checkbox retains switch semantics, keyboard Space interaction and checked state, while a custom rounded track/thumb supplies the visible toggle. The hidden native control has a visible focus indicator on the track. Preserve preference persistence, the open menu, current page and form drafts while changing theme; include forced-colors treatment.
+
+Use Google's Material Icons Outlined for menu/close, add-box, disclosure arrows, period navigation, money, nicotine-trends chart and activity tag. Reuse the same icon for each meaning across pages, keep existing 44px control alignment and accessible control names, and hide decorative SVGs from assistive technology. Bundle SVG paths locally in icons.js, precache with the app shell and keep Apache-2.0 license/provenance under icons/material/. The existing brand/PWA artwork stays; the activity pie remains data visualization.
+
+Verification: JavaScript syntax, theme/feedback regression, nicotine/spending chart regression, color contrast checks, bundled icon coverage and switch/focus/offline hooks. Browser/iOS visual and keyboard-device verification remains for review.

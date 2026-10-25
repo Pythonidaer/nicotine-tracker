@@ -28,9 +28,9 @@ let sudokuGame=null,cravingStartedAt=0,cravingFinishedAt=0,cravingTimer=null,sud
 const localDate=d=>`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
 let lastAdded=null,pouchFormOpen=false,feedbackTimer=null;
 const activityOptions=['Working at kiosk','Concentrating on computer','At comedy','At a movie','At home','After eating','Traveling','Taking a break','Socializing','After waking up','Other'];
-const addEntryIcon='<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M12 8v8M8 12h8"/></svg>';
-const closeEntryIcon='<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg>';
-const pickerChevron='<svg class="chevron" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>';
+const addEntryIcon=window.PouchIcons.svg('add');
+const closeEntryIcon=window.PouchIcons.svg('close',20,'');
+const pickerChevron=window.PouchIcons.svg('expand',18,'chevron');
 function entryPicker(name,label,options,value,suffix=""){
   const pickerId=name+suffix;
   const selected=options.find(option=>option.value===String(value));
@@ -164,7 +164,7 @@ const persist=()=>{try{localStorage.setItem('pouch-tracker-v1',JSON.stringify({v
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const money=n=>'$'+n.toFixed(2),time=()=>new Date().toLocaleTimeString([], {hour:'numeric',minute:'2-digit'});
 const items=()=>[...entries,...purchases].sort((a,b)=>b.id-a.id);
-const entryChevron='<svg class="chevron" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>';
+const entryChevron=window.PouchIcons.svg('expand',18,'chevron');
 const findEntry=id=>[...entries,...purchases].find(entry=>entry.id===id);
 const validOptionalActivity=entry=>entry.activity===undefined||(typeof entry.activity==='string'&&entry.activity.length<=120);
 const validOptionalNote=entry=>entry.note===undefined||(typeof entry.note==='string'&&entry.note.length<=1000);
@@ -307,7 +307,7 @@ root.querySelectorAll('nav button').forEach(b=>b.dataset.view===view?b.setAttrib
 if(view==='craving'){content.innerHTML=cravingMarkup();updateCravingTimer();cravingTimer=setInterval(updateCravingTimer,1000);return;}
 if(view==='today'&&pouchFormOpen){content.innerHTML=pouchEntryMarkup();return;}
 const today=localDate(new Date()),week=new Date();week.setHours(0,0,0,0);week.setDate(week.getDate()-((week.getDay()+6)%7));const weekKey=localDate(week),month=today.slice(0,7);let total=entries.filter(e=>e.type==='pouch'&&e.date===today),spent=purchases.filter(p=>p.date>=weekKey&&p.date<=today).reduce((s,p)=>s+p.amount,0),monthSpent=purchases.filter(p=>p.date.startsWith(month)&&p.date<=today).reduce((s,p)=>s+p.amount,0);
-if(view==='today')content.innerHTML=`${pouchEntryMarkup()}<h3>Summary</h3>${todayTotals(total)}<section class="purchase-section" aria-labelledby="purchase-title"><div class="row pouch-entry-heading"><h2 id="purchase-title">Add purchase</h2><button type="button" class="add-entry-icon" data-action="purchase" aria-label="Add purchase entry">${addEntryIcon}</button></div><h3>Spending</h3><div class="totals spending-totals"><div><div class="value">${money(spent)}</div><div class="caption">Week</div></div><div><div class="value">${money(monthSpent)}</div><div class="caption">Month</div></div></div></section><details class="recent"><summary>Recent entries <svg class="chevron" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></summary>${rows(entries.filter(e=>e.date===today).slice(0,3),false,true)}</details>`;
+if(view==='today')content.innerHTML=`${pouchEntryMarkup()}<h3>Summary</h3>${todayTotals(total)}<section class="purchase-section" aria-labelledby="purchase-title"><div class="row pouch-entry-heading"><h2 id="purchase-title">Add purchase</h2><button type="button" class="add-entry-icon" data-action="purchase" aria-label="Add purchase entry">${addEntryIcon}</button></div><h3>Spending</h3><div class="totals spending-totals"><div><div class="value">${money(spent)}</div><div class="caption">Week</div></div><div><div class="value">${money(monthSpent)}</div><div class="caption">Month</div></div></div></section><details class="recent"><summary>Recent entries ${window.PouchIcons.svg('expand',18,'chevron')}</summary>${rows(entries.filter(e=>e.date===today).slice(0,3),false,true)}</details>`;
 if(view==='history')content.innerHTML=`<h2 class="page-heading">History</h2>${weeklyHistory()}`;
 if(view==='trends')content.innerHTML=trendsMarkup(monthSpent);
 if(view==='resources')content.innerHTML=window.pouchResources;
@@ -409,7 +409,7 @@ root.addEventListener('keydown',event=>{
 });
 
 function trendModeIcon(spending){
-  return `<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">${spending?'<rect x="3" y="3" width="18" height="18" rx="2"/><path d="M12 5v14m4-11c-1-2-8-2-8 1 0 4 8 2 8 6 0 3-7 3-8 1"/>':'<rect x="6" y="3" width="12" height="18" rx="5"/><path d="M8 10h8"/>'}</svg>`;
+  return window.PouchIcons.svg(spending?'money':'nicotine');
 }
 function trendsMarkup(monthSpent){
   const end=new Date();end.setHours(12,0,0,0);end.setDate(end.getDate()-trendOffset*7);
@@ -424,9 +424,9 @@ function trendsMarkup(monthSpent){
   const dateLabel=d=>d.toLocaleDateString([], {month:'short',day:'numeric',year:'numeric'});
   const days=dates.map(d=>localDate(d)===localDate(new Date())?'Today':d.toLocaleDateString([], {weekday:'short'}));
   const peak=Math.max(1,...nicotineTotals.filter(n=>n!==null));
-  const arrow=direction=>`<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="${direction==='previous'?'m15 6-6 6 6 6':'m9 6 6 6-6 6'}"/></svg>`;
+  const arrow=direction=>window.PouchIcons.svg(direction==='previous'?'previous':'next',18);
   const period=`<div class="row pouch-entry-heading"><h2>${activityTrends?'Activities':'Trends'}</h2><button type="button" class="add-entry-icon" ${activityTrends?'hidden':''} data-action="toggle-trends" aria-label="${spendingTrends?'Show nicotine trends':'Show spending trends'}" aria-pressed="${spendingTrends}">${trendModeIcon(!spendingTrends)}</button></div><div class="trend-period"><button type="button" class="link" data-trend="previous" aria-label="Previous seven days" ${canGoBack?'':'disabled'}>${arrow('previous')}</button><span class="caption" aria-live="polite">${dateLabel(dates[0])} – ${dateLabel(end)}</span><button type="button" class="link" data-trend="next" aria-label="Next seven days" ${trendOffset?'':'disabled'}>${arrow('next')}</button></div>`;
-  const activityLink=`<div class="trend-view-link"><button type="button" class="link" data-action="activities"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M20 13 11 22 2 13V3h10l8 10Z"/><circle cx="7" cy="8" r="1"/></svg>Activities</button></div>`;
+  const activityLink=`<div class="trend-view-link"><button type="button" class="link" data-action="activities">${window.PouchIcons.svg('activity',18)}Activities</button></div>`;
   if(activityTrends)return `${period}${activityChart(total)}<div class="trend-view-link"><button type="button" class="link" data-action="close-activities">${trendModeIcon(spendingTrends)}${spendingTrends?'Spending trends':'Nicotine trends'}</button></div>`;
   if(spendingTrends){
     const purchaseDays=dates.map(d=>purchases.filter(p=>p.date===localDate(d)));
