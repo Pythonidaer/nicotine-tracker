@@ -271,10 +271,15 @@ body { margin: 0; background: var(--p-bg); color: var(--p-fg); }
 #pouch-preview .sudoku-row:nth-child(2n):not(:last-child) { border-bottom: 2px solid var(--p-fg); }
 #pouch-preview .sudoku-row > div:nth-child(3) { border-right: 2px solid var(--p-fg); }
 
-/* Pouch counts remain readable on short or zero-mg nicotine bars. */
+/* Keep revealed pouch counts within their nicotine bar. */
 #pouch-preview .nicotine-bars .bar { position: relative; }
-#pouch-preview .nicotine-bars .bar-nicotine { position: absolute; bottom: 4px; padding: 2px 3px; background: var(--p-accent); }
+#pouch-preview .nicotine-bars .bar-nicotine { position: absolute; bottom: 4px; left: 0; width: 100%; padding: 0; background: transparent; text-align: center; white-space: normal; }
 #pouch-preview .nicotine-bars .trend-day:focus-visible .bar-nicotine[hidden] { display: block; }
 @media (hover: hover) and (pointer: fine) {
   #pouch-preview .nicotine-bars .trend-day:hover .bar-nicotine[hidden] { display: block; }
+}
+
+#pouch-preview .nicotine-bars .pouch-count-break { display: none; }
+@media (max-width: 639px) {
+  #pouch-preview .nicotine-bars .pouch-count-break { display: block; }
 }
