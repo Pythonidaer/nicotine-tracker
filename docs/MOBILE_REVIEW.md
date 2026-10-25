@@ -10,7 +10,7 @@ This specification records the user-approved changes from the mobile review. It 
 | Condensed/serif tracking text and small labels | Tracking uses system UI, 16px body/input text, 14px supporting text, 22px primary headings, 18px section headings and 600-weight hierarchy. Oswald remains the wordmark; Merriweather remains article reading text. Compact seven-column chart annotations remain 12px with exact values in accessible button labels. |
 | Equal emphasis for primary logging and spending | Today leads with nicotine (40px) then pouch count (30px). Add pouch is a compact full-width row button. Spending values are 22px, with a smaller labelled Add purchase action. Remove Summary and duplicated Add purchase/Spending heading layers. |
 | Frequent destinations hidden in hamburger | Today, History and Trends stay visible beneath the header. Fight the craving, Quitting nicotine, Settings and Dark mode stay in the dropdown. No fixed bottom overlay. |
-| Different navigation patterns within Trends | One labelled Nicotine / Spending / Activities button group, using aria-pressed and ordinary native keyboard buttons. Switching preserves the selected week. |
+| Different navigation patterns within Trends | A labelled Measure dropdown selects Nicotine, Spending or Activities. It is visually distinct from the persistent primary navigation. Switching preserves the selected week and returns focus to the selector. |
 | Automatic per-week chart rescaling | Daily nicotine and spending use an all-logged-days maximum, rounded up, independently by measure. Every displayed week shares that scale, shown with units. Heights encode actual daily totals; no assumed zero nicotine on missing days. |
 | Pie chart difficult to compare | Activities use sorted horizontal blue bars, each with direct label, percentage and count, and a total. All bars represent a share of the same week's logged pouches on 0–100%; missing activity stays Not specified. No decorative category hues or slice-selection interaction. |
 | Uneven local spacing | Three named spacing roles: field 8px, group 16px, section 24px. Related controls/copy stay grouped; dividers separate larger sections. Keep date controls shrinkable and mobile pouch fields full width. |
@@ -33,7 +33,7 @@ This specification records the user-approved changes from the mobile review. It 
 - Keep the Add pouch row available after saving. Success/Undo is separate; immediate repeat logging, cancel, storage rollback, target prompt and game return remain.
 - Shared pickers remain bounded, field-width and scrollable, with keyboard support. Keep 44px target heights.
 - Theme switching keeps page/form state and saved preference. Reuse switch markup for reduction enablement; preserve focus-visible and forced-colors treatments.
-- History remains weekly and editable, with wrapping date/activity metadata and full-width notes. Today remains read-only under Recent entries.
+- History remains weekly and editable, with wrapping date/activity metadata and full-width notes. Today no longer renders Recent entries; History is the single record list.
 - Article typography is a separate reading context. No redesign of its source content or treatment claims.
 - Never delete/reinstall the PWA to receive this change; use Settings → Update app.
 
@@ -42,3 +42,8 @@ This specification records the user-approved changes from the mobile review. It 
 Automated checks cover calendar/year boundaries, cross-week shared scales, logged-day means, missing/zero days, actual spending totals, escaped activity labels, count-toggle behavior, full-row logging, grouped Settings, shared switches, both theme palettes and existing backups/game/custom-option flows. JavaScript syntax and cache-asset inventory are checked.
 
 Native iOS PWA safe areas, larger text, actual touch/VoiceOver and true offline reopening still require device review. Browser checks of the published screens are reported separately; they do not imply a native iPhone test.
+
+
+## Later approved warm direction
+
+See [WARM_DIRECTION.md](WARM_DIRECTION.md). It replaces the muted blue palette with cyan/magenta accents and warm plum/blush surfaces, uses equal metric columns across Today/Spending, removes Recent entries from Today and replaces stacked Trends tabs with a Measure dropdown. Menu destinations are Sudoku break and Cutting back guide. Tracking, History, backup and tapering behavior remain.

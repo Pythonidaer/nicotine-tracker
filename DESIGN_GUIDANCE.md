@@ -1,6 +1,6 @@
 # Design guidance and decisions
 
-Current mobile interface specification: [docs/MOBILE_REVIEW.md](docs/MOBILE_REVIEW.md). It supersedes earlier dated decisions about tracking fonts, pie charts, bottom activity links, icon-only trend navigation, rolling periods and Settings organization. The blue measurement palette remains in force.
+Current mobile interface specification: [docs/MOBILE_REVIEW.md](docs/MOBILE_REVIEW.md). It supersedes earlier dated decisions about tracking fonts, pie charts, bottom activity links, icon-only trend navigation, rolling periods and Settings organization. The later [warm vivid direction](docs/WARM_DIRECTION.md) is authoritative for colors, surfaces, alignment, menu labels and the Trends measure dropdown.
 
 Updated 2026-10-19. Shared source: [LLM Instruction Toolkit](https://github.com/Pythonidaer/llm-instruction-toolkit/tree/9e136f976f8b63e9063ac518ec36fdcb0804227a/design).
 
@@ -220,6 +220,8 @@ Verification: syntax and regression checks cover differing count/dose rankings, 
 
 
 ## Color theory application
+
+Current palette: [docs/COLOR_PALETTE.md](docs/COLOR_PALETTE.md), revised to the user-approved cyan/magenta accents and warm plum/blush surfaces. Earlier muted-blue descriptions below record implementation history, not the current palette.
 
 Apply [docs/color-theory-rules.md](docs/color-theory-rules.md) alongside the current [palette specification](docs/COLOR_PALETTE.md). The user approved the muted-blue measurement palette, replacing the earlier general-purpose green accent. The palette specification is authoritative for current colors; earlier dated sections describe implementation history.
 

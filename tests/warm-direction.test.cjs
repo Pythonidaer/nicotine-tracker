@@ -1,0 +1,21 @@
+// Run: node tests/warm-direction.test.cjs
+const fs=require('node:fs'),path=require('node:path'),assert=require('node:assert/strict');
+const app=fs.readFileSync(path.join(__dirname,'..','app.js'),'utf8'),html=fs.readFileSync(path.join(__dirname,'..','index.html'),'utf8'),css=fs.readFileSync(path.join(__dirname,'..','style.css'),'utf8');
+assert(!app.includes('class="recent"'));
+assert(!app.includes('if(readOnly)return'));
+assert(app.includes('function rows(list,showDate=false)'));
+assert(app.includes('function weeklyHistory'));
+assert(html.includes('Sudoku break'));assert(html.includes('Cutting back guide'));
+assert(!html.includes('>Fight the craving</button>'));
+assert(app.includes('id="trend-view"'));
+assert(!app.includes('data-trend-view'));
+const start=app.indexOf("root.addEventListener('change',e=>{if(e.target.id==='trend-view')"),end=app.indexOf('\n',start);
+const handler=app.slice(start,end);
+const run=new Function(`let spendingTrends=false,activityTrends=false,trendOffset=3,listener,focus=0,renders=0;const content={querySelector:()=>({focus:()=>focus++})},render=()=>renders++,root={addEventListener:(type,fn)=>{listener=fn}};${handler};return value=>{listener({target:{id:'trend-view',value}});return {spendingTrends,activityTrends,trendOffset,focus,renders}};`)();
+let state=run('spending');assert(state.spendingTrends);assert.equal(state.trendOffset,3);
+state=run('activities');assert(state.activityTrends);assert(!state.spendingTrends);
+state=run('nicotine');assert(!state.activityTrends);assert(!state.spendingTrends);assert.equal(state.focus,3);
+assert(css.includes('background: var(--p-action-fill)'));
+assert(css.includes('.spending-bars .bar { background: var(--p-spending); }'));
+assert(css.includes('.spending-bars .bar-nicotine { color: var(--p-spending-on); }'));
+console.log('PASS: removed duplicate Recent UI, preserved History, truthful menu labels and measure-switch focus/week preservation.');

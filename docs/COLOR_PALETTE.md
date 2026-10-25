@@ -1,73 +1,44 @@
-# Measurement color palette
+# Warm vivid color palette
 
-User-approved direction: a precise nicotine measurement tool. Muted blue supports interaction and observation; neutral surfaces keep attention on values. These are intentional interface conventions, not a claim that specific hues cause nicotine reduction.
+Approved direction: cyan and magenta accents, a warm plum dark surface and soft blush light surface. This is a vivid accent palette with warm neutrals, not a strict three-hue triad. Treat 60–30–10 as an optional distribution guide, never a measured quota.
 
-## Theme values
+## Values
 
-| Responsibility | Token | Light | Dark |
-| --- | --- | --- | --- |
-| Page/menu/control surface | --p-bg | #FAFAF8 | #191B1E |
-| Primary text | --p-fg | #242B33 | #E8EDF2 |
-| Secondary text | --p-muted | #5C6773 | #AAB5C2 |
-| Decorative divider | --p-line | #DCE1E6 | #37414C |
-| Actions, links and selection | --p-accent | #365F85 | #A6C6E8 |
-| Text on action/data fill | --p-on | #FFFFFF | #14283C |
-| Field/picker boundary | --p-control-border | #687786 | #91A0AF |
-| Outside keyboard focus | --p-focus-ring | #242B33 | #E8EDF2 |
-| Inset focus on selection | --p-focus-on-selected | #FFFFFF | #14283C |
-| Nicotine/spending data | --p-data | #365F85 | #A6C6E8 |
-| Verified reduction, reserved | --p-progress | #276447 | #94CBA9 |
-| Target attention | --p-attention | #805500 | #E8BE68 |
-| Error/invalid input | --p-error | #A02D36 | #F1A0A6 |
-
-## Responsibilities and states
-
-- Blue: Save, links, add controls, disclosure icons, menu/picker selection, article headings, switches and nicotine/spending bars. Bar height represents quantity; every amount keeps the same data blue. Larger consumption is not rewarded with green.
-- Neutral: Pouch added, Entry updated and routine Saved confirmations. Keep the actual wording and Undo; neutral confirmation acknowledges record keeping.
-- Green: reserved for explicit, measured reductions against a stated baseline. No green reduction indicator is added by this update because no such comparison is currently displayed. A partial day, an unlogged day, game completion, and being below a target do not prove reduced use.
-- Amber: with tapering enabled and a usable baseline, a pouch or nicotine total becomes attention-colored when at least 80% of that metric's guide has been used, including reaching/exceeding it. This threshold is a UI choice, not a clinical rule. Preserve Pouches/Nicotine remaining or over target labels and the existing optional craving prompt. Never block logging or apply failure language.
-- Red: invalid taper percentage, native user-invalid form-field borders and Update app failures. Keep explanatory text, native validity messages and aria-invalid where applicable. Native alert dialogs remain OS-controlled, including storage failures.
-- Focus: use the independent primary-text ring outside ordinary controls and on-fill ring inside selected picker options. Existing hover, focus-visible, pressed, selected and disabled behaviors stay. Theme toggling preserves the current page and form drafts.
-- Short chart bars: revealed counts above short/zero bars use primary page text color and replace the usual value label during the reveal. Taller-bar labels use on-fill text. Mobile pouch counts remain stacked with transparent backgrounds.
-- Activity charts: use horizontal bars in the same data blue, with a direct activity label, percentage and pouch count. All categories share the same 0–100% scale; color does not rank activities as good/bad. This supersedes the earlier pie and multicolor legend.
-- Brand artwork: the header uses a matching blue SVG pouch mark. Existing PNG installed-PWA icons remain for iOS compatibility and existing installations; they are identity artwork, not progress indicators.
-
-## Token dependencies
-
-Action and data tokens currently have identical blue values but are independent semantic decisions. Progress, attention and error colors must not inherit the action token. Decorative dividers do not supply the sole form-field boundary. Extra primitive/component token layers are unnecessary for this bounded palette.
-
-Light/dark values use CSS light-dark(). theme.js applies the system or saved explicit preference before the stylesheet, and updates browser theme-color metadata to the matching surface. Preference key pouch-tracker-theme, log key pouch-tracker-v1 and backup version 1 are unchanged.
-
-## Contrast checks
-
-sRGB contrast, rounded to two decimals:
-
-| Foreground / background | Light | Dark |
+| Token | Light | Dark |
 | --- | --- | --- |
-| Primary / page | 13.68:1 | 14.65:1 |
-| Secondary / page | 5.52:1 | 8.30:1 |
-| Action or data / page | 6.41:1 | 9.75:1 |
-| On-fill text / action or data | 6.70:1 | 8.48:1 |
-| Control boundary / page | 4.40:1 | 6.45:1 |
-| Progress / page | 6.70:1 | 9.35:1 |
-| Attention / page | 6.25:1 | 9.86:1 |
-| Error / page | 6.87:1 | 8.48:1 |
+| `--p-bg` | `#FFF1ED` | `#34232E` |
+| `--p-surface` | `#FFFAF7` | `#44323F` |
+| `--p-fg` | `#34232E` | `#FFF1ED` |
+| `--p-muted` | `#65505D` | `#DEC9D5` |
+| `--p-line` | `#E0CCD3` | `#654A5C` |
+| `--p-accent` | `#00758B` | `#5ED9ED` |
+| `--p-on` | `#34232E` | `#34232E` |
+| `--p-action-fill` | `#00B8D9` | `#00B8D9` |
+| `--p-control-border` | `#826875` | `#B79AAA` |
+| `--p-focus-ring` | `#34232E` | `#FFF1ED` |
+| `--p-focus-on-selected` | `#34232E` | `#34232E` |
+| `--p-data` | `#008097` | `#00B8D9` |
+| `--p-data-on` | `#FFFFFF` | `#34232E` |
+| `--p-spending` | `#CF166B` | `#FF79B6` |
+| `--p-spending-on` | `#FFFFFF` | `#34232E` |
+| `--p-progress` | `#276447` | `#94CBA9` |
+| `--p-attention` | `#805400` | `#F1CC76` |
+| `--p-attention-bg` | `#FFF0CC` | `#493919` |
+| `--p-error` | `#A02D36` | `#FFADB7` |
 
-Text pairs meet the checked 4.5:1 threshold; control boundaries meet 3:1. These calculations do not establish complete WCAG conformance, distinguishability of every activity category, or verified usability.
+## Semantic use
 
-## Validation
+- Cyan action fill is #00B8D9 with dark plum text in both themes. Accessible text links use a deeper cyan in light mode and a softer cyan in dark mode.
+- Nicotine and activity-share bars use the cyan data token; light-mode cyan is deepened enough for chart/background and white-on-fill label contrast.
+- Spending bars/values use magenta, with a brighter soft pink variant in dark mode. Spending is a distinct measure, not a warning or reward.
+- Warm plum supplies dark-mode page surfaces and light-mode text. Soft blush supplies the light-mode page and dark-mode text. Quiet raised surfaces organize content without covering the interface in large saturated panels.
+- Routine saves use neutral text. Green remains reserved for explicitly measured reductions and is not displayed as a reward for logging.
+- Amber is confined to target captions/a small guide notice and the optional target prompt. Large over-target values remain primary text. Errors use independent red plus explanatory labels.
+- On-fill text, data text, spending text and focus-on-selection are separate roles so cyan/magenta changes cannot silently break contrast.
+- Light/dark preference and browser theme-color metadata still update before the stylesheet paints. Existing log and preference storage keys and version-1 backups are unchanged.
 
-Run:
+## Verification
 
-```sh
-node tests/mobile-layout.test.cjs
-node tests/color-contrast.test.cjs
-node tests/palette-states.test.cjs
-node tests/feedback-theme.test.cjs
-node tests/nicotine-trends.test.cjs
-node tests/material-icons.test.cjs
-node tests/tapering-sudoku.test.cjs
-node tests/custom-options.test.cjs
-```
+Automated contrast checks cover text/page, action fill/text, nicotine fill/text, spending fill/text, boundaries, selection focus, attention, error and reserved progress in both themes. All checked text pairs are at least 4.5:1; non-text boundaries/data are at least 3:1 where checked. These pairwise calculations are not a claim of complete WCAG conformance.
 
-Checks cover explicit light/dark pairs, attention thresholds/off/no-baseline behavior, error recovery, neutral saved feedback, theme persistence and existing tracking/chart/game behavior. Browser executable is unavailable in this environment: true offline reopening, native Safari focus, larger text and appearance in both themes still need iPhone review.
+The header SVG uses plum and cyan; legacy PNG Home Screen artwork is retained for installed-iOS compatibility. See [WARM_DIRECTION.md](WARM_DIRECTION.md) for layout, naming and interaction changes.

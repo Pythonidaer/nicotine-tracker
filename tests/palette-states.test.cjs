@@ -36,7 +36,7 @@ const updateSource=app.slice(app.indexOf('async function updateApp'),app.indexOf
  const theme=fs.readFileSync(path.join(__dirname,'..','theme.js'),'utf8');
  let themeColor;const scope={matchMedia:()=>({matches:false,addEventListener:()=>{}}),dispatchEvent:()=>{}};
  new Function('window','document','localStorage','Event',theme)(scope,{documentElement:{dataset:{},style:{}},querySelector:()=>({setAttribute:(name,value)=>{themeColor=value}})},{getItem:()=>null,setItem:()=>{}},class{});
- assert.equal(themeColor,'#fafaf8');scope.PouchTheme.set('dark');assert.equal(themeColor,'#191b1e');
+ assert.equal(themeColor,'#fff1ed');scope.PouchTheme.set('dark');assert.equal(themeColor,'#34232e');
  assert(css.includes('.bar { width: 100%; background: var(--p-data);'));
  assert(css.includes('.pouch-feedback { display: flex; align-items: center; gap: 8px; color: var(--p-muted);'));
  console.log('PASS: independent target attention, neutral logging, invalid/save recovery, update errors and theme metadata.');

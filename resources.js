@@ -1,7 +1,7 @@
 /* Original summaries. Source scope and review notes: RESOURCE_SOURCES.md. */
 window.pouchResources = `
 <article class="resource-page" aria-labelledby="resources-title">
-  <h1 id="resources-title">Quitting nicotine</h1>
+  <h1 id="resources-title">Cutting back guide</h1>
   <p>You have a record of your pouch use. Now you can use it to decide what to change. Start with one manageable step, plan for the moments that trip you up, and get help when you need it.</p>
   <nav class="resource-contents" aria-label="On this page">
     <a href="#notice-pattern">Notice the pattern</a>

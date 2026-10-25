@@ -34,7 +34,7 @@ assert(html.includes('Daily average · logged days'));
 assert(html.includes('4 of 7 days logged.'));
 assert(html.includes('0.3 mg'));
 assert(html.includes('bar-label-on-surface'));
-assert(html.includes('data-trend-view="activities"'));
+assert(html.includes('<option value="activities"'));
 ui.select('nicotine',1);assert(ui.render().includes('Scale: 0–60 mg'));
 ui.select('spending');html=ui.render();
 assert(html.includes('Spending totals'));assert(!html.includes('Spending averages'));

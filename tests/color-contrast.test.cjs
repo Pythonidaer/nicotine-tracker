@@ -12,9 +12,9 @@ function luminance(hex){
 function contrast(a,b){const x=luminance(a),y=luminance(b);return (Math.max(x,y)+.05)/(Math.min(x,y)+.05);}
 const checks=[
  ['p-fg','p-bg',4.5],['p-muted','p-bg',4.5],['p-accent','p-bg',4.5],
- ['p-on','p-accent',4.5],['p-control-border','p-bg',3],
- ['p-focus-ring','p-bg',3],['p-focus-on-selected','p-accent',3],
- ['p-data','p-bg',3],['p-on','p-data',4.5],['p-progress','p-bg',4.5],
+ ['p-on','p-action-fill',4.5],['p-control-border','p-bg',3],
+ ['p-focus-ring','p-bg',3],['p-focus-on-selected','p-action-fill',3],
+ ['p-data','p-bg',3],['p-spending','p-bg',4.5],['p-spending-on','p-spending',4.5],['p-data-on','p-data',4.5],['p-progress','p-bg',4.5],
  ['p-attention','p-bg',4.5],['p-error','p-bg',4.5]
 ];
 for(const [front,back,minimum] of checks){

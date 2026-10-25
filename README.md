@@ -62,7 +62,7 @@ Serve this folder with any static HTTP server. Service workers require HTTPS or 
 
 ## Quitting nicotine resources
 
-Open Quitting nicotine in the header menu for practical guidance on patterns, changes, cravings, withdrawal, and professional support. Original summaries link to CDC, Smokefree, Health Canada, FDA, and Cochrane; evidence limitations are explicit. The guide works offline after updating; external articles need a connection. See [RESOURCE_SOURCES.md](RESOURCE_SOURCES.md) for provenance and review triggers.
+Open Cutting back guide in the header menu for practical guidance on patterns, changes, cravings, withdrawal, and professional support. Original summaries link to CDC, Smokefree, Health Canada, FDA, and Cochrane; evidence limitations are explicit. The guide works offline after updating; external articles need a connection. See [RESOURCE_SOURCES.md](RESOURCE_SOURCES.md) for provenance and review triggers.
 
 ## Design instructions
 
@@ -70,7 +70,7 @@ Read [AGENTS.md](AGENTS.md), [DESIGN_GUIDANCE.md](DESIGN_GUIDANCE.md) and the [c
 
 ## Color palette
 
-The app uses a muted-blue measurement palette in light and dark mode. See [docs/COLOR_PALETTE.md](docs/COLOR_PALETTE.md) for exact colors, semantic responsibilities, contrast checks and state behavior. Blue identifies actions and data, amber marks daily-target attention, red marks errors, and green is reserved for verified reductions. The menu switch remembers your appearance preference.
+The app uses cyan and magenta accents with warm plum dark mode and soft blush light mode. See [docs/COLOR_PALETTE.md](docs/COLOR_PALETTE.md) for exact colors, semantic responsibilities, contrast checks and state behavior. Cyan identifies actions and nicotine data, magenta identifies spending, amber marks daily-target attention, red marks errors, and green is reserved for verified reductions. The menu switch remembers your appearance preference.
 
 ## Refresh the installed app
 
@@ -87,3 +87,7 @@ The resource article’s contents links scroll directly to their section and mov
 On Today, tap anywhere on the Add pouch row. Brand and nicotine per pouch are prefilled from Settings. Adjust them for this entry, optionally choose what you are doing, then tap Save. Saving closes the form and shows Pouch added with Undo for about four seconds before restoring the add icon. Keyboard focus on Undo keeps the feedback available. Cancel discards the unsaved entry. Per-entry changes do not overwrite your default product, and activity starts unspecified to avoid carrying a stale situation forward.
 
 Activities: Working at kiosk, Concentrating on computer, At comedy, At a movie, At home, After eating, Traveling, Taking a break, Socializing, After waking up, Other. Activity is shown in History/Recent entries and included in backups. Existing version-1 entries without activity still work. This is descriptive context, not a diagnosis or treatment recommendation.
+
+## Current visual direction
+
+See [docs/WARM_DIRECTION.md](docs/WARM_DIRECTION.md). Today has no duplicate Recent entries list; open History for records. Trends uses one Measure dropdown. Sudoku break identifies the puzzle; Cutting back guide identifies the article. The approved vivid colors use accessible light/dark variants.
