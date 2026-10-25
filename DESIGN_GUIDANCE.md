@@ -208,3 +208,10 @@ Verification: syntax compilation; 50 transformed boards independently checked fo
 Replace mini Sudoku with a 6×6 board using numbers 1–6. Each row, column and 2-row-by-3-column box must contain each number once. Fourteen fixed clues start a unique-solution board, varied through digit permutations and box-preserving row/band and column/stack swaps. Do not transpose rectangular boxes. Draw horizontal box dividers after rows 2 and 4 and a vertical divider after column 3; use a six-button keypad and six-cell keyboard boundaries. Keep the elapsed timer, completion stop, New puzzle reset, session progress and unrestricted return to logging.
 
 Verification: syntax compilation, taper regression, 50 transformed puzzles independently checked for uniqueness and matching solutions, rectangular-box conflict checks, legal repeats, fixed-clue protection, bounds and completion. Generated markup contains six rows, 36 cells and six number buttons. Native iOS layout/touch and true offline reopening remain for device testing.
+
+
+## Nicotine-first Trends chart
+
+The nicotine Trends chart is headed Nicotine logged. Daily nicotine sums in mg set bar heights and visible labels; logged nicotine-free days remain 0 mg, while days without records retain the dash. Tapping a bar toggles its pouch-count reveal and closes the previous selection. Mouse hover and keyboard-visible focus also reveal pouch counts. Keep accessible date/mg/count labels, singular/plural wording, weekly navigation, paired seven-day averages and spending/activity views. Short and zero-mg bars keep the revealed count readable.
+
+Verification: syntax and regression checks cover differing count/dose rankings, zero and decimal doses, missing days, pouch-count selection toggles and spending. Browser verification could not run because the local Playwright browser executable is unavailable; native iOS layout and touch remain for device review. Advance app-shell/cache versions together without changing saved data.
